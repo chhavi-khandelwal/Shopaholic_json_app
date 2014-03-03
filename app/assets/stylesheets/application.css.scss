@@ -1,0 +1,112 @@
+/*
+ * This is a manifest file that'll be compiled into application.css, which will include all the files
+ * listed below.
+ *
+ * Any CSS and SCSS file within this directory, lib/assets/stylesheets, vendor/assets/stylesheets,
+ * or vendor/assets/stylesheets of plugins, if any, can be referenced here using a relative path.
+ *
+ * You're free to add application-wide styles to this file and they'll appear at the top of the
+ * compiled file, but it's generally better to create a new file per style scope.
+ *
+ *= require_self
+ *= require_tree .
+ *= require bootstrap_and_overrides
+ */
+
+
+
+.notice {
+  display: none;
+}
+
+#transaction {
+  padding: 20%;
+}
+
+.cart-image {
+  width:40px;
+}
+
+#mandatory-comment {
+  margin-top: 5%;
+}
+
+.mandatory {
+  color: red;
+  font-weight: bold;
+  display: inline;
+}
+
+.container-body {
+  display: block;
+  width: 96%;
+  padding: 2%;
+  border-bottom: 4px solid #eee;
+}
+
+.container-head {
+  display: block;
+  padding: 2%;
+  width: 96%;
+  border-bottom: 4px solid #eee;
+}
+
+.head-text {
+  display: inline-block;
+  width: 27%;
+  margin-left: 2%;
+}
+
+.container-content {
+  display: inline-block;
+  width: 30%;
+  margin-left: 2%;
+}
+
+.container-description {
+  display: inline-block;
+  width: 40%;
+  margin-left: 2%;
+}
+
+.display-container {
+  width: 100%;
+  border: 4px solid #eee;
+  margin-left: 0%;
+  margin-right: 5%;
+}
+
+.container-title {
+  display: inline-block;
+  margin-left: 2%;
+  width: 20%;
+}
+
+.brand-title {
+  margin-left: 13%;
+  width: 54%;
+  display: inline-block;
+}
+
+#cart-count-container {
+  margin-top: -4%;
+  margin-left: 88%;
+}
+
+.nav-products {
+  width: 100px;
+  border: 1px solid #F3F2F2;
+}
+
+#search-box {
+  margin-left:5%;
+}
+
+.float-right
+{
+  float:right;
+  margin-top:1%;
+}
+
+
+

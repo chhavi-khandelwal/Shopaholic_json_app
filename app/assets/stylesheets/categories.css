@@ -1,0 +1,27 @@
+.filter-heading
+{
+  border-bottom: 2px solid grey;
+  background: #eee;
+  margin-top: 10%;
+}
+
+#filters
+{
+  padding: 0.5%;
+  margin-top: 3%;
+}
+
+.filters
+{
+  margin-top: 5%;
+}
+
+.filterElement
+{
+  margin-top: 2%;
+}
+
+.filterName
+{
+  margin-left: 3%;
+}

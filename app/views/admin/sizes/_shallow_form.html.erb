@@ -1,0 +1,41 @@
+<%= form_for [:admin, @size], remote: true do |f| %>
+  <%= render partial: '/errors', locals: { object: @size } %>
+
+  <table class="table color-table">
+    <tbody>
+      <tr>
+        <th>Name<p class='mandatory'>*</p></th>
+        <th>SKU<p class='mandatory'>*</p></th>
+        <th>Color</th>
+        <th>Price<p class='mandatory'>*</p></th>
+        <th>Discounted Price<p class='mandatory'>*</p></th>
+        <th>Quantity<p class='mandatory'>*</p></th>
+        <th></th>
+      </tr>
+      <tr>
+        <td>
+          <%= f.text_field :name, class: 'size-text-field', required: true %>
+        </td>
+        <td>
+          <%= f.text_field :sku, class: 'size-text-field', required: true %>
+        </td>
+        <td>
+          <%= f.collection_select :color_id, @size.color.product.colors, :id, :name, {}, class: 'size-select-list'  %>
+        </td>
+        <td>
+          <%= f.text_field :price, class: 'size-text-field', required: true %>
+        </td>
+        <td>
+          <%= f.text_field :discounted_price, class: 'size-text-field', required: true %>
+        </td>
+        <td>
+          <%= f.text_field :quantity, class: 'size-text-field', required: true %>
+        </td>
+        <td>
+          <%= f.submit %>
+        </td>
+      </tr>
+      <tr><p class='mandatory'>*mandatory field</p></tr>
+    </tbody>
+  </table>
+<% end %>

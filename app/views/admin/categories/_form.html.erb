@@ -1,0 +1,21 @@
+<%= form_for([:admin, @category]) do |f| %>
+  <%= render partial: '/errors', locals: { object: @category } %>
+
+  <div class='main-form'>
+    <div>
+      <div class='form-label'>
+        <%= f.label :name, class: 'inliner-tile' %>
+        <p class='mandatory'>*</p>
+      </div>
+      <div class='form-text'>
+        <%= f.text_field :name, required: true  %>
+      </div>
+    </div>
+    <div class="form-action">
+      <%= f.submit %>
+    </div>
+    <div id='mandatory-comment'>
+    <p class='mandatory'>*mandatory field</p>
+  </div>
+  </div>
+<% end %>

@@ -1,0 +1,57 @@
+/*
+  =require twitter-bootstrap-static/bootstrap
+
+  Use Font Awesome icons (default)
+  To use Glyphicons sprites instead of Font Awesome, replace with "require twitter-bootstrap-static/sprites"
+  =require twitter-bootstrap-static/fontawesome
+  */
+li {
+  color: red;
+  list-style: none;
+  font-weight: bold;
+}
+
+td, th {
+  text-align: center;
+}
+
+.alert {
+  margin-left: 20%;
+}
+
+tr:first-child {
+  background-color: #B0E0E6;
+  border: 2px solid #CD3333;
+}
+
+.size-text-field, .size-select-list {
+  width: 60%;
+}
+
+form td {
+  width: 20%;
+  margin-left: 0px;
+}
+
+.category-table, .product-table, .brand-table {
+  border: 2px solid;
+  width: 70%;
+  margin-left: 20%;
+}
+
+td.list_actions {
+  width: 40%;
+}
+
+.dashboard-products {
+  width: 100%;
+}
+
+.nav-list {
+  padding-left: 0px;
+  padding-right: 2px;
+}
+
+.nav-btn {
+  padding: 8%;
+}

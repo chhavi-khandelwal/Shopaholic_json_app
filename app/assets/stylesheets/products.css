@@ -1,0 +1,160 @@
+.product-in-focus {
+  display: inline-block;
+  border: 1px solid #ADACAC;
+  border-radius: 10px;
+  padding: 5%;
+  width: 25%;
+  vertical-align: top;
+}
+
+.product-angles {
+  display: inline-block;
+  width: 10%;
+}
+
+#bottom-panel {
+  text-align: center;
+  margin-top: 2%;
+}
+
+
+.bottom-panel-image {
+  width: 800px;
+  height: 180px;
+  margin-left: 5%;
+}
+
+.size-container {
+  display: block;
+  margin-left: 5%;
+}
+
+.product-in-focus-desc {
+  display: inline-block;
+  border: 1px solid #ADACAC;
+  border-radius: 5px;
+  padding: 2%;
+}
+
+
+.selected {
+  border: 1px solid red !important;
+}
+
+.angle {
+  border: 1px solid #ADACAC;
+  border-radius: 5px;
+  margin-top: 5%;
+  padding: 2%;
+  float: left;
+}
+
+.display-angle {
+  display: none;
+}
+
+.product-focus {
+  padding-top: 5%;
+  margin-left: 5% !important;
+}
+
+.small-image {
+  width: 60px;
+  height: 60px;
+}
+
+#offer-sizes {
+  width: 20%;
+  display: inline-block;
+  vertical-align: top;
+  margin-left: 5%;
+}
+
+#details-tab {
+  border: 1px solid #ADACAC;
+  text-align: center;
+  margin-top: 10%;
+  padding-top: 2%;
+  background: black;
+  color: white;
+}
+
+#details-tab-container {
+  display: inline-block;
+  border-radius: 8px;
+  margin-left: 5%;
+  width: 20%;
+  background: #C54E4E;
+  color: white;
+}
+
+#color-avail {
+  margin-top: 5%;
+  display: block;
+  margin-left: 10%;
+  margin-bottom: 10%;
+}
+
+.color-all {
+  display: inline-block;
+  border: 1px solid #ADACAC;
+  border-radius: 2px;
+  padding: 1%;
+}
+
+#details-tab-content {
+  padding: 20%;
+  border: 1px solid #ADACAC;
+  margin-top: 0px;
+}
+
+.cart-btn {
+  margin-left: 18%;
+}
+
+
+.angle:hover, .color-all:hover {
+  border: 1px solid red;
+}
+
+#size-name {
+  display: block;
+  margin-left: 5%;
+}
+
+#size-price {
+  display: block;
+  border-radius: 5%;
+  border: 2px solid #ADACAC;
+}
+
+#real-price {
+  display: block;
+  color: #8B7D7B;
+  font-size: 20px;
+  font-family: serif; 
+  padding: 2%;
+  margin-left: 5%; 
+  margin-top: 5%;
+}
+
+#discounted-price {
+  display: block;
+  color: #3A3A38;
+  font-weight: bold;
+  font-size: 28px;
+  font-family: serif; 
+  padding: 2%;
+  margin-left: 5%; 
+}
+
+.size-all {
+  background-color: #E6E4E4;
+  border: 1px solid #ADACAC;
+  display: inline;
+  padding: 5%;
+}
+
+.add-btn {
+
+}

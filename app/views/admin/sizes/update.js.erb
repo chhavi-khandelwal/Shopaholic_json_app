@@ -1,0 +1,2 @@
+$("#edit_size_<%= @size.id %>").remove();
+$("#size_<%= @size.id %>").html("<%= escape_javascript(render partial: @size) %>")

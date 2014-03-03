@@ -1,0 +1,29 @@
+<div class="head">
+  <h3>Categories</h3>
+</div>
+
+<div id="new-tag-btn">
+  <%= button_to 'New Category', new_admin_category_path, class: 'new-btn btn-primary btn', method: :get %>
+</div>
+
+<div class="display-container">
+  <div class='container-head'>
+    <h5 class='brand-title'>Name</h5>
+    <h5 class='container-content'>Actions</h5>
+  </div>
+  <% @categories.each do |category| %>
+    <div class='container-body'>
+      <div class='brand-title'><%= category.name %></div>
+      <div class='container-content'>
+        <%= link_to 'Edit', edit_admin_category_path(category), class: 'btn btn-primary' %>
+        <%= link_to 'Destroy', admin_category_path(category), method: :delete,
+        data: { confirm: "You are going to delete #{ category.name } category. Sure?" }, class: 'btn btn-primary' %>
+      </div>
+    </div>
+  <% end %>
+</div>
+
+<div class='container-pagination'>
+  <%= paginate @categories %>
+</div>
+

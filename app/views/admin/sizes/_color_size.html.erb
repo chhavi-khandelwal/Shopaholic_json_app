@@ -1,0 +1,28 @@
+<div class="head">
+  <h3>Sizes</h3>
+</div>
+
+<div class="head" id="new-tag-btn">
+  <%= button_to 'New Size', new_admin_product_size_path(@product), class: 'btn-primary btn form-btn', data: { href: new_admin_product_size_path(@product) }, method: :get %>
+</div>
+
+<p id='error-content'></p>  
+<div id="size-form"></div>
+
+<table class="table size-table">
+  <tr>
+    <th>Name</th>
+    <th>SKU</th>
+    <th>Color</th>
+    <th>Price</th>
+    <th>Discounted Price</th>
+    <th>Quantity</th>
+    <th>Actions</th>
+  </tr>
+  <% #FIXME_AB: As a good practice we should not use Models directly in views -%>
+  <% @sizes.each do |size| %>
+  <tr id="size_<%= size.id %>", class="<%= Color.find(size.color_id).name %>">
+    <%= render partial: 'admin/sizes/size', locals: { size: size } %>
+  </tr>
+  <% end %>
+</table>

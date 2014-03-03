@@ -1,0 +1,68 @@
+.container-pagination {
+  margin-left: 87%;
+}
+
+.form-label {
+  width: 20%;
+  margin-left: 10%;
+  display: inline-block;
+  vertical-align: top;
+}
+
+.form-text {
+  margin-left: 10%;
+  display: inline-block;
+}
+
+.form-list {
+  margin-left: 10%;
+  display: inline-block;
+}
+
+.form-action {
+  margin-left: 45%;
+  margin-top: 5%;
+}
+
+#new-tag-btn {
+  text-align: center;
+}
+
+.form-head {
+  margin-bottom: 5%;
+  margin-left: 40%;
+}
+
+.main-form {
+  margin-left: 20%;
+  border: 2px solid;
+  padding: 5%;
+  width: 50%;
+  border-radius: 10px;
+}
+
+.form-foot {
+  margin-left: 75%;
+}
+
+#error_explanation {
+  text-align: center;
+}
+
+.product-desc {
+  display: inline-block;
+  width: 110%;
+  height: auto;
+  text-align: center;
+  border: 2px solid black;
+}
+
+#product-content {
+  margin-left:5%;
+  width: 80%;
+}
+
+#error-content {
+  font-weight: bold;
+  color: red;
+}

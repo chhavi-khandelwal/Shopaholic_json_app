@@ -1,0 +1,2 @@
+class CannotDestroy < StandardError
+end

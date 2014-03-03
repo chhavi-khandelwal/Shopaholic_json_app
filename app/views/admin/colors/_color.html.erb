@@ -1,0 +1,12 @@
+<td>
+  <%= color.name %>
+</td>
+<td>
+  <% color.images.each do |image| %>
+    <%= image_tag image.file.url(:thumb), class: 'color-image' %>
+  <% end %>
+</td>
+<td> 
+  <%= link_to 'Edit', edit_admin_color_path(color), class: 'btn-primary btn admin-edit-color' %>
+  <%= link_to 'Destroy', admin_color_path(color), class: 'btn-primary btn admin-destroy-color' %>
+</td>

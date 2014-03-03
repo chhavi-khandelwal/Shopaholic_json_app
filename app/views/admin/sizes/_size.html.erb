@@ -1,0 +1,10 @@
+<td><%= size.name %></td>
+<td><%= size.sku %></td>
+<td><%= size.color.name %></td>
+<td><%= size.price %></td>
+<td><%= size.discounted_price %></td>
+<td><%= size.quantity %></td>
+<td>
+  <%= link_to 'Edit', edit_admin_size_path(size), class: 'btn-primary btn', remote: true %>
+  <%= link_to 'Destroy', admin_size_path(size), method: :delete, data: { confirm: "You are going to delete #{ size.name } size. Sure?" }, class: 'btn-primary btn', remote: true %>
+</td>

@@ -1,0 +1,1 @@
+REGEXP = { name_format: /^([\w\s]+\-?[\w\s]+)+$|^([\w\s]+)$/ }

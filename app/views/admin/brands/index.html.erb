@@ -1,0 +1,28 @@
+<div class="head">
+  <h3>Brands</h3>
+</div>
+
+<div id="new-tag-btn">
+  <%= button_to 'New Brand', new_admin_brand_path, class: 'new-btn btn-primary btn', method: :get %>
+</div>
+
+
+<div class="display-container">
+  <div class='container-head'>
+    <h5 class='brand-title'>Name</h5>
+    <h5 class='container-content'>Actions</h5>
+  </div>
+  <% @brands.each do |brand| %>
+    <div class='container-body'>
+      <div class='brand-title'><%= brand.name %></div>
+      <div class='container-content'>
+        <%= link_to 'Edit', edit_admin_brand_path(brand), class: 'btn btn-primary' %>
+        <%= link_to 'Destroy', admin_brand_path(brand), method: :delete,
+        data: { confirm: "You are going to delete #{ brand.name } brand. Sure?" }, class: 'btn btn-primary' %>
+      </div>
+    </div>
+  <% end %>
+</div>
+<div class='container-pagination'>
+  <%= paginate @brands %>
+</div>

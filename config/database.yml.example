@@ -1,0 +1,8 @@
+development:
+  adapter: mysql2
+  database: shopaholic_development
+  host: localhost
+  encoding: utf8
+  reconnect: false
+  username: ----
+  password: ----

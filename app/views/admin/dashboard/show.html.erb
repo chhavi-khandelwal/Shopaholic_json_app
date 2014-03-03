@@ -1,0 +1,33 @@
+<div id="dashboard-title">Hello, Admin This is Your Dashboard</div>
+
+<div class='box'>
+  <div class="box-link">
+    <%= link_to 'Add More', new_admin_category_path, class: 'pure-black-link' %>
+  </div>
+  <h3>Recent Categories</h3>
+  <div class="box-desc">
+    <div class="box-recent">
+      <% @categories.each do |category| %>
+        <div class="tag margin-up-5"><%= link_to category.name, admin_category_path(category), class: 'pure-black-link' %></div>
+          <% end %>
+     </div>
+    <h4>You have <%= Category.all.count %> total Categories</h4>
+    <div><%= link_to 'Show all Categories of your website', admin_categories_path, class: 'pure-blue-link' %></div>
+  </div>
+</div>
+
+<div class='box'>
+  <div class="box-link">
+    <%= link_to 'Add More', new_admin_product_path, class: 'pure-black-link' %>
+  </div>
+  <h3>Recent Products</h3>
+  <div class="box-desc">
+    <div class="box-recent">
+      <% @products.each do |product| %>
+        <%= link_to(image_tag(product.colors.first.thumbnail_in_focus(:medium), width: '75px'), admin_product_path(product))  %>
+          <% end %>
+     </div>
+    <h4>You have <%= @products.count %> total Products</h4>
+    <div><%= link_to 'Show all Products of your website', admin_products_path, class: 'pure-blue-link' %></div>
+  </div>
+</div>

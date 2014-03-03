@@ -1,0 +1,13 @@
+<div id='product-content'>
+  <div class="product-desc" id="product-head">
+    <p>Title: <%= @product.title %></p>
+    <p>Description: <%= @product.description %></p>
+  </div>
+
+  <div class="product-desc color-box">
+    <%= render 'admin/colors/product_color' %>
+  </div>
+  <div class="product-desc size-box">
+    <%= render 'admin/sizes/color_size' %>
+  </div>
+</div>

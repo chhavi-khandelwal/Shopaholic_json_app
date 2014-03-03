@@ -1,0 +1,34 @@
+<div id='cart-show'>
+  <div id='your-cart'>
+  <p id='cart-head'>YOUR CART</p>
+  </div>
+
+  <div id='cart-container'>
+    <div id='cart-desc'>
+      <p class='cart-desc-text'>Product</p>
+      <p class='cart-desc-text'>Brand</p>
+      <p class='cart-desc-text'>Size</p>
+      <p class='cart-desc-text'>Color</p>
+      <p class='cart-desc-text'>Quantity</p>
+      <p class='cart-desc-text'>Sub-Total</p>
+    </div>
+
+    <% @cart.line_items.each do |cart_item| %>
+      <div class='items-container' data-size-id="<%= cart_item.size.id %>"  data-quantity="<%= cart_item.quantity%>">
+        <%= image_tag(cart_item.size.color.images.first.file.url(:small)) %>
+        <p class='item-text'><%= cart_item.size.color.product.title %></p>
+        <p class='item-text'><%= cart_item.size.color.product.brand.name %></p>
+        <p class='item-text size_id'><%= cart_item.size.name %></p>
+        <p class='item-text'><%= cart_item.size.color.name %></p>
+        <p class='item-text '><b><%= cart_item.quantity %></b></p>
+        <p class='item-text'>$<%= cart_item.size.discounted_price %></p>
+        <p class='item-text'><%= link_to 'X', line_item_path(cart_item), method: :delete, class: 'btn-danger btn' %></p>
+      </div>
+    <% end %>
+  </div>
+
+  <div id='total'>
+    <span>YOUR TOTAL: <%= @cart.line_items.sum { |line_item|  line_item.size.discounted_price * line_item.quantity } %></span>
+    <%= link_to 'Proceed to Pay', payment_cart_path(@cart), id: "proceed-pay", class: "btn" %>
+  </div>
+</div>

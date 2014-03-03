@@ -1,0 +1,23 @@
+<div class="head">
+  <h3>Colors</h3>
+</div>
+
+<div class="head" id="new-tag-btn">
+  <%= button_to 'New Color', new_admin_product_color_path(@product), class: 'new-btn btn-primary btn', data: { href: new_admin_product_color_path(@product) }, method: :get %>
+</div>
+
+
+<div id="color-form"></div>
+
+<table class="table color-table">
+  <tr>
+    <th>Name</th>
+    <th>Images</th>
+    <th>Actions</th>
+  </tr>
+  <% @product.colors.each do |color| %>
+    <tr id="color_<%= color.id %>">
+      <%= render partial: 'admin/colors/color', locals: {color: color} %>
+    </tr>
+  <% end %>
+</table>

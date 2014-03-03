@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= content_for?(:title) ? yield(:title) : "Shopaholic" %></title>
+    <%= csrf_meta_tags %>
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
+    <!--[if lt IE 9]>
+      <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.6.1/html5shiv.js" type="text/javascript"></script>
+    <![endif]-->
+
+    <%= stylesheet_link_tag "application", :media => "all" %>
+
+    <!-- For third-generation iPad with high-resolution Retina display: -->
+    <!-- Size should be 144 x 144 pixels -->
+    <%= favicon_link_tag 'apple-touch-icon-144x144-precomposed.png', :rel => 'apple-touch-icon-precomposed', :type => 'image/png', :sizes => '144x144' %>
+
+    <!-- For iPhone with high-resolution Retina display: -->
+    <!-- Size should be 114 x 114 pixels -->
+    <%= favicon_link_tag 'apple-touch-icon-114x114-precomposed.png', :rel => 'apple-touch-icon-precomposed', :type => 'image/png', :sizes => '114x114' %>
+
+    <!-- For first- and second-generation iPad: -->
+    <!-- Size should be 72 x 72 pixels -->
+    <%= favicon_link_tag 'apple-touch-icon-72x72-precomposed.png', :rel => 'apple-touch-icon-precomposed', :type => 'image/png', :sizes => '72x72' %>
+
+    <!-- For non-Retina iPhone, iPod Touch, and Android 2.1+ devices: -->
+    <!-- Size should be 57 x 57 pixels -->
+    <%= favicon_link_tag 'apple-touch-icon-precomposed.png', :rel => 'apple-touch-icon-precomposed', :type => 'image/png' %>
+
+    <!-- For all other devices -->
+    <!-- Size should be 32 x 32 pixels -->
+    <%= favicon_link_tag 'favicon.ico', :rel => 'shortcut icon' %>
+
+    <%= javascript_include_tag "application" %>
+  </head>
+  <body>
+    <header id='home-header'>
+      <div id='top-head'>
+        <p class='inline-tile'>WELCOME |</p>
+        <p class='inline-tile'>
+          <a href="">LOGIN</a>
+        </p>
+        <div class='inline-tile'>
+          <input type="text" id='search-box' placeholder="Search on Shopaholic.."/>
+        </div>
+      </div>
+      <div id='bottom-head'>
+        <a class='inline-tile site-name' id='site-logo' href="<%= root_url %>">Shopaholic</a>
+        <div id='header-links' class='inline-tile'>
+          <% Category.all.each do |category| %>
+            <div class='inline-tile head-link'>
+              <%= link_to category.name.capitalize, category_path(category), class: 'link-tile category-tile', id: category.id %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+      <div id="cart-count-container">
+        <%= image_tag('cart.png', class: 'cart-image') %>
+        <% if Cart.find_by(id: session[:cart_id]) %>
+          <a id="cart-link" href="<%= cart_path(Cart.find_by(id: session[:cart_id]))%>">Your Cart(<span id="cart-count">
+            <%= Cart.find_by(id: session[:cart_id]).try(:line_items).try(:count) %></span>)
+          </a><br/>
+        <% else %>
+          <a id="cart-link" href="javascript:alert('cart not found');">Your Cart(<span id="cart-count"><%= Cart.find_by(id: session[:cart_id]).try(:line_items).try(:count) %></span>)
+          </a><br/>
+        <% end %>
+      </div>
+    </header>
+
+    <div class="container-fluid">
+      <div class="row-fluid">
+         <div class="span12" id="main-container">
+          <%= bootstrap_flash %>
+          <%= yield %>
+        </div>
+      </div> 
+
+      <footer id='bottom-foot'>
+        <div class='inline-tile logo-tile'>
+          <p class='block-tile foot site-name'>Shopaholic</p>
+          <p class='foot'>© 2006-2014 Shopaholic Inc.<br>
+            SHOPAHOLIC, SHOPAHOLIC LOGO are<br>
+            trademarks of Shopaholic Inc.
+          </p>
+        </div>
+        <div class='inline-tile foot'>
+          <p class='block-tile'>HOME</p>
+          <%= link_to 'HOME', '#', class: 'link-tile block-tile' %>
+          <%= link_to 'HOME', '#', class: 'link-tile block-tile' %>
+          <%= link_to 'HOME', '#', class: 'link-tile block-tile' %>
+        </div>
+        <div class='inline-tile foot'>
+          <p class='block-tile'>CONTACT US</p>
+          <%= link_to 'CONTACT US', '#', class: 'link-tile block-tile' %>
+          <%= link_to 'CONTACT US', '#', class: 'link-tile block-tile' %>
+          <%= link_to 'CONTACT US', '#', class: 'link-tile block-tile' %>
+        </div>
+        <div class='inline-tile foot'>
+          <p class='block-tile'>HELP</p>
+          <%= link_to 'HELP', '#', class: 'link-tile block-tile' %>
+          <%= link_to 'HELP', '#', class: 'link-tile block-tile' %>
+          <%= link_to 'HELP', '#', class: 'link-tile block-tile' %>
+        </div>
+        <div class='inline-tile foot'>
+          <p class='inline-tile'>ACCOUNT</p>
+          <%= link_to 'ACCOUNT', '#', class: 'link-tile block-tile' %>
+          <%= link_to 'ACCOUNT', '#', class: 'link-tile block-tile' %>
+          <%= link_to 'ACCOUNT', '#', class: 'link-tile block-tile' %>
+        </div>
+      </footer>
+
+    </div> <!-- /container -->
+
+  </body>
+</html>

@@ -1,0 +1,47 @@
+<%= form_for [:admin, @product] do |f| %>
+  <%= render partial: '/errors', locals: { object: @product } %>
+  <div class='main-form'>
+    <div>
+      <div class='form-label'>
+        <%= f.label :category %>
+      </div>
+      <div class='form-list'>
+        <%= f.collection_select :category_id, @categories, :id, :name  %>
+      </div>
+    </div>
+    <div>
+      <div class='form-label'>
+        <%= f.label :brand %>
+      </div>
+      <div class='form-list'>
+        <%= f.collection_select :brand_id, @brands, :id, :name %>
+      </div>
+    </div>
+
+    <div class="field">
+      <div class='form-label'>
+        <%= f.label :title, class: 'inliner-tile' %>
+        <p class='mandatory'>*</p>
+      </div>
+      <div class='form-text'>
+        <%= f.text_field :title, required: true %>
+      </div>
+    </div>
+
+    <div class="field">
+      <div class='form-label'>
+        <%= f.label :description, class: 'inliner-tile' %>
+        <p class='mandatory'>*</p>
+      </div>
+      <div class='form-text'>
+        <%= f.text_area :description, required: true %>
+      </div>
+    </div>
+    <div class="form-action">
+      <%= f.submit %>
+    </div>
+    <div id='mandatory-comment'>
+      <p class='mandatory'>*mandatory field</p>
+    </div>
+  </div>
+<% end %>
