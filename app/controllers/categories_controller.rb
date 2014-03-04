@@ -1,8 +1,18 @@
 class CategoriesController < ApplicationController
   before_action :set_category, only: [:show] 
+  
   def show
     @products = @category.products.published
-    render json: { products: @products.as_json(:include => [:brand, {:colors => {:include => [:sizes] }}]), images: get_product_images(@category), filters: render_to_string({ partial: 'categories/filter', layout: false }) }
+    render json: { 
+      products: @products.as_json(
+        { include: { brand: { only: :name }, 
+                      colors: { include: { sizes: { only: [:id, :name, :price, :discounted_price, :quantity] }}, only: [:id, :name, :published]
+                      } 
+                    }, 
+         only: [:id, :title, :description, :category_id, :brand_id]
+        }), 
+      images: get_product_images(@category)
+    }
   end
 
   private

@@ -8,22 +8,23 @@ function ProductGrid() {
 
     //binds click event to the input checkboxes
     this.bindEvents = function() {
-        $('#main-container').on('click', 'input[type="checkbox"]', productGrid.filterProducts);
+      $('#main-container').on('click', 'input[type="checkbox"]', productGrid.filterProducts);
     }
 
     //filters the products from selected filter
     this.filterProducts = function() {
-        var $gridProducts = $('.latest-products');
-        $gridProducts.hide();
-        var productfilter = [];
-        var filters = ["brand", "color"];
-        for (var i = 0; i < filters.length; i++) {
-            productfilter = productGrid.filterSelection(filters[i]);
-            if (productfilter.length > 0) {
-                $gridProducts = productGrid.getFilteredProducts(productfilter, $gridProducts);
-            }
+        console.log("a")
+      var $gridProducts = $('.latest-products');
+      $gridProducts.hide();
+      var productfilter = [];
+      var filters = ["brand", "color"];
+      for (var i = 0; i < filters.length; i++) {
+        productfilter = productGrid.filterSelection(filters[i]);
+        if (productfilter.length > 0) {
+          $gridProducts = productGrid.getFilteredProducts(productfilter, $gridProducts);
         }
-        $gridProducts.show();
+      }
+      $gridProducts.show();
     }
 
     //selects the filtered products in an array

@@ -14,46 +14,47 @@ function Product() {
         url: $('#latest-products-container').data('href'),
         dataType: 'json'
       }).complete(function(data) {
-        var response = data.responseJSON;
-        var published_colors = response['colors'];
-        var published_products = response.products;
-        for (var i in published_colors) {
-          if (published_products[published_colors[i].id]) {
-            product.getProductDetails(published_colors, response, i);
-          }
+        var published_products = data.responseJSON.products;
+        for (var i in published_products) {
+          product.getProductDetails(published_products, i);
         }
       });
     }    
   }
 
-  this.getProductDetails = function(published_colors, response, i) {
-    var published_products = response.products;
+  this.getProductDetails = function(published_products, i) {
     var latest_product = $('<div/>').addClass('latest-products').appendTo($('#latest-products-container'));
-    var product_image = $('<img>').attr('src', response.images[published_colors[i].id]);
-    $('<div/>').addClass('latest-products-image').html(product_image).appendTo(latest_product);
-    var quick_view = product.createQuickViewBtn(published_colors, i);
-    quick_view.insertAfter(product_image);
+    var product_image = $('<img>').attr('src', published_products[i].image);
+    product.displayProductImage(product_image, latest_product);
+    product.displayQuickViewBtn(published_products, i, product_image);
     var latest_products_desc = $('<div/>').addClass('latest-products-desc').appendTo(latest_product);
-    product.getContent(response, i, latest_products_desc);
+    product.getContent(published_products, i, latest_products_desc);
+  }
+
+  this.displayProductImage = function(product_image, latest_product) {
+    $('<div/>').addClass('latest-products-image').html(product_image).appendTo(latest_product);
   }
 
   this.bindEvents = function() {
     $main_container.on('click', '.quick-view.btn', this.viewProduct);
   }
 
-  this.createQuickViewBtn = function(published_colors, i) {
-    return ($('<a/>').attr({'href': '/products/' + published_colors[i].product_id + '/colors/' + published_colors[i].id, class: 'quick-view visibility btn'}).html('Quick View'));
+  this.displayQuickViewBtn = function(published_products, i, product_image) {
+    var quick_view = product.createQuickViewBtn(published_products, i);
+    quick_view.insertAfter(product_image);
+
   }
 
-  this.getContent = function(response, i, latest_products_desc) {
-    var brands  = response.brands;
-    var published_colors = response['colors'];
-    var published_products = response.products;
-    var title = published_products[published_colors[i].id]['title'];
+  this.createQuickViewBtn = function(published_products, i) {
+    return ($('<a/>').attr({'href': '/products/' + published_products[i].id + '/colors/' + i, class: 'quick-view visibility btn'}).html('Quick View'));
+  }
+
+  this.getContent = function(published_products, i, latest_products_desc) {
+    var title = published_products[i]['title'];
     product.getContentContainer(title, latest_products_desc);
-    var description = (published_products[published_colors[i].id]['description'].substring(0,20) + '...');
+    var description = (published_products[i]['description'].substring(0,20) + '...');
     product.getContentContainer(description, latest_products_desc);
-    var brand = brands[published_colors[i].id]['name'];
+    var brand = published_products[i]['brand'];
     product.getContentContainer(brand, latest_products_desc);
   }
 

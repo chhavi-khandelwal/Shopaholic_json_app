@@ -22,4 +22,5 @@ class Size < ActiveRecord::Base
 
   validates :sku, uniqueness: true
 
+
 end

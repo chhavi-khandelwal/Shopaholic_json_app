@@ -50,30 +50,41 @@ function CategoryProduct() {
       dataType: 'json'
     }).complete(function(data) {
       var response = data.responseJSON;
-      var filters = data.responseJSON.filters;
       var display_container = $('<div>', { id:'display-container', class:'span8' } );
       $('#main-container').html(display_container);
       display_container.append($('<div>', { id: 'latest-products-container' }));
-      categoryProduct.displayProducts(response)
-      categoryProduct.displayFilters(filters);
+      var filterElements = categoryProduct.getDetails(response);
+      categoryProduct.displayFilters(filterElements);
     });
   }
 
-  this.displayProducts = function(response) {
+  this.getDetails = function(response) {
     var products = response.products;
     var images = response.images;
+    var productColors = [];
+    var productBrands = [];
     for(key in products) {
-      var product = products[key]
+      var product = products[key];
+      productBrands.push(product.brand.name);
       for(color_key in product.colors) {
-        var color = product.colors[color_key]
+        var color = product.colors[color_key];
         if(color.published == true) {
-          categoryProduct.getDetails(product, color, images);
+          productColors.push(color.name);
+          categoryProduct.displayProducts(product, color, images);
         }
       }
     }
+    var filterElements = categoryProduct.getFilterElementsHash(productColors, productBrands);
+    return filterElements;
   }
 
-  this.getDetails = function(product, color, images) {
+  this.getFilterElementsHash = function(productColors, productBrands) {
+    var productColors = $.unique(productColors);
+    var productBrands = $.unique(productBrands);
+    return ({ 'color': productColors, 'brand': productBrands });
+  }
+
+  this.displayProducts = function(product, color, images) {
     var latest_product = categoryProduct.createLatestProductContainer(product, color);
     $('#latest-products-container').append(latest_product);
     img_container = $('<div>', {class: 'latest-products-image'});
@@ -92,13 +103,35 @@ function CategoryProduct() {
   }
 
   this.getDescription = function(product, latest_product) {
-    return ($('<div>', { class: 'latest-products-desc' }).append('<div><h5>' + product['title'] + '</h5></div>')
+    var latest_products_desc = $('<div>', { class: 'latest-products-desc' }).append('<div><h5>' + product['title'] + '</h5></div>')
       .append($('<div><p class="inline-tile">' + product.description + '</p></div>'))
-      .append('<div><p class="inliner-tile">' + product.brand.name + '</p> <b>Rs. ' + latest_product.data('price') + '</b></div>'));
+      .append('<div><p class="inliner-tile">' + product.brand.name + '</p> <b>Rs. ' + latest_product.data('price') + '</b></div>');
+    return latest_products_desc;
   }
 
-  this.displayFilters = function(filters) {
-    $('<div/>', { id: 'side-panel' }).appendTo('#main-container').append(filters);
+  this.displayFilters = function(filterElements) {
+    var filters = ['color', 'brand']
+    var filterContainer = $('<div/>', { id: 'filters', class: 'span2'});
+    for (var i = 0, len = filters.length; i < len; i++) {
+      var filterHeading = categoryProduct.getFilterHead(filters[i], filterContainer);
+      var filterCollection = $('<div/>', {id: (filters[i] + '-filters')}).insertAfter(filterHeading);
+      var filterTag = filterElements[filters[i]];
+      categoryProduct.displayFilterTags(filterTag, filterCollection);
+    }
+    $('<div/>', { id: 'side-panel' }).appendTo('#main-container').append(filterContainer);
+  }
+
+  this.displayFilterTags = function(filterTag, filterCollection) {
+    for (var j = 0, jLen = filterTag.length; j < jLen; j++) {
+      $('<div/>', {class: 'filterElement'}).append($('<input>', {'type': 'checkbox', 'value': filterTag[j]}))
+        .append($('<span/>', {class: 'filterName'}).html(filterTag[j]))
+        .appendTo(filterCollection);
+    }
+  }
+
+  this.getFilterHead = function(filterName, filterContainer) {
+    var filterHead = $('<div/>', {class: 'filter-heading'}).html(filterName).appendTo(filterContainer);
+    return filterHead;
   }
 }
 
