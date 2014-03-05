@@ -70,10 +70,180 @@ function Product() {
       url: $(this).attr('href'),
       dataType: 'json'
     }).complete(function(data) {
-      var response = data.responseJSON;
-      $main_container.html(response.product);
       $('#side-panel').remove();
+      var response = data.responseJSON;
+      var productFocus = product.getProductFocus();
+      product.displayProductDetails(response, productFocus);
+      $main_container.html(productFocus);
     });
   }
 
+  this.displayProductDetails = function(response, productFocus) {
+    var productAngles = $('<div/>', {class: 'product-angles'}).appendTo(productFocus);
+    product.getImageViews(response, productAngles);
+    var productInFocus = product.displayProductInFocus(response,  productFocus);
+    product.appendContainer(productInFocus, productFocus);
+    var offeredSizes = product.getOfferedSizes(response);
+    product.appendContainer(offeredSizes, productFocus);
+    var productDetails = product.getProductDescription(response);
+    product.appendContainer(productDetails, productFocus);
+    var availableColors = product.getAvailableColors(response);
+    product.appendContainer(availableColors, productFocus);
+  }
+
+  this.appendContainer = function(nest, main) {
+    console.log("a")
+    nest.appendTo(main);
+  }
+
+  this.getImageViews = function(response, productAngles) {
+    var current_color = response.current_color['id'];
+    var images = response.images;
+    for (var image_key in images[current_color]['small']) {
+      var image = product.getCurrentProductImage(response, image_key, 'medium');
+      $('<div/>', {class: 'angle', 'data-focussed-image': images[current_color]['medium'][image_key] }).append(image.addClass('small-image')).appendTo(productAngles);
+    }
+  }
+
+  this.getProductFocus = function() {
+    var productFocus = $('<div/>', { class: 'product-focus span10 offset1' })
+        .append($('<div/>', {class: 'alert fade in alert-danger visibility', id: 'before-add'}));
+    return productFocus;    
+  }
+
+  this.displayProductInFocus = function(response,  productFocus) {
+    var image = product.getCurrentProductImage(response, 0, 'medium')
+    var productInFocus = $('<div/>', { class: 'product-in-focus' }).append(image);
+    return productInFocus;
+  }
+
+  this.getCurrentProductImage = function(response, key, size) {
+    var current_color = response.current_color['id'];
+    var images = response.images;
+    var image = $('<img>', {'src': images[current_color][size][key]});
+    return image;
+  }
+
+  this.getOfferedSizes = function(response) {
+    var sizeNameTag = $('<div/>', { id: 'size-name', class: 'block-tile'});
+    var offeredSizesContainer = $('<div/>', { id: 'offer-sizes' }).append(sizeNameTag);
+    sizeNameTag.append($('<p/>', { class: 'inline-tile' }).html('SELECT SIZE - '))
+    product.getCurrentProductSize(response, sizeNameTag);
+    product.displaySizeContainer(response, offeredSizesContainer);
+    var sizePrice = product.getPrice(response);
+    sizePrice.appendTo(offeredSizesContainer);
+    return offeredSizesContainer;
+  }
+
+  this.getFirstSize = function(response) {
+    var sizes = product.getSizes(response);
+    return sizes[0];
+  }
+
+  this.getCurrentProductSize = function(response, sizeNameTag) {
+    var currentSize = product.getFirstSize(response);
+    currentSize = currentSize.name;
+    $('<span/>', {id: 'selected-size-value', class:'inline-tile'}).append($('<strong/>')
+      .html(currentSize))
+      .appendTo(sizeNameTag);
+  }
+
+  this.getSizes = function(response) {
+    var currentProductColors = response.products.colors;
+    var current_color = response.current_color['id'];
+    var sizes;
+    for (var key in currentProductColors) {
+      if (currentProductColors[key].id == current_color) {
+        sizes = currentProductColors[key]['sizes'];
+        break;
+      }
+    }
+    return sizes;
+  }
+
+  this.displaySizeContainer = function(response, offeredSizesContainer) {
+    var sizes = product.getSizes(response);
+    var sizeContainer = $('<div/>', { class: 'size-container' }).appendTo(offeredSizesContainer);
+    for (var key in sizes) {
+      var size = product.getSizeContainer(sizes, key);
+      size.appendTo(sizeContainer)
+      .append($('<span/>').html(sizes[key].name));
+    }
+  }
+
+  this.getSizeContainer = function(sizes, key) {
+    var sizeContainer = $('<div/>', { class: 'size-all', id: sizes[key].id, 'data-price': sizes[key].price, 'data-discounted-price': sizes[key].discounted_price });
+    return sizeContainer;
+  }
+
+  this.getPrice = function(response) {
+    var sizePrice = $('<div/>', { id: 'size-price' });
+    var size = product.getFirstSize(response);
+    sizePrice.append($('<p/>', {id: 'real-price'}).html('Real ' + size.price))
+      .append($('<p/>', {id: 'discounted-price'}).html('Discounted ' + size.discounted_price));
+    return sizePrice;
+  }
+
+  this.getProductDescription = function(response) {
+    var current_product = response.products;
+    var detailsContainer = $('<div/>', { id: 'details-tab-container' });
+    $('<div/>', { id: 'details-tab' }).append($('<p/>').html('Details'))
+      .appendTo(detailsContainer);
+    var contentTab = $('<div/>', { id: 'details-tab-content' }).appendTo(detailsContainer);
+    product.getBasicDetails(current_product, contentTab);
+    $('<div/>', {class: 'cart-btn'}).append($('<a/>', { class: 'btn btn-success add-btn', id: 'add-cart', 'data-href': '/carts'}).html('Add To Cart')).appendTo(detailsContainer);
+    return detailsContainer;
+  }
+
+  this.getBasicDetails = function(current_product, contentTab) {
+    $('<div/>').append($('<h5/>').html(current_product.title)).appendTo(contentTab);
+    $('<div/>').append(product.getContentTag(current_product.description)).appendTo(contentTab);
+    $('<div/>').append(product.getContentTag(current_product.brand['name'])).appendTo(contentTab);
+  }
+
+  this.getContentTag = function(textVal) {
+    var contentTag = $('<p/>', {class: 'inliner-tile'}).html(textVal);
+    return contentTag;
+  }
+
+  this.getAvailableColors = function(response) {
+    var availColorContainer = $('<div/>', { id: 'color-avail' });
+    var productColors = response.products.colors;
+    var images = response.images;
+    for (var key in productColors) {
+      var productColor = productColors[key];
+      product.displayAvailableColor(productColor, availColorContainer, images);
+    }
+    return availColorContainer;
+  }
+
+  this.displayAvailableColor = function(productColor, availColorContainer, images) {
+    var colorId = productColor.id;
+    var productImages = images[colorId];
+    $('<div/>', { class: 'color-all'})
+      .data({'images': product.getImages(productImages, 'small'), 'focussed-image': productImages['medium'][0], 'image-angles': product.getImages(productImages, 'medium'), 'sizes': product.getSizeDetails(productColor, 'name'), 'size-ids': product.getSizeDetails(productColor, 'id'), 'size-price': product.getSizeDetails(productColor, 'price'), 'size-discounted-price': product.getSizeDetails(productColor, 'discounted_price') }).append($('<img>', { 'src': productImages['small'][0], class: 'small-image'}))
+      .appendTo(availColorContainer);
+
+  }
+
+  this.getImages = function(images, size) {
+    var images = images[size];
+    var img_collection = [];
+    for (var key in images) {
+      img_collection.push(images[key]);
+    }
+    return img_collection;
+  }
+
+  this.getSizeDetails = function(productColor, key) {
+    var sizeDetail = [];
+    for (var size_key in productColor.sizes) {
+      var size = productColor.sizes[size_key];
+      if (Number(size[key]) == NaN)
+        sizeDetail.push(size[key]);
+      else
+        sizeDetail.push(Number(size[key]));
+    }
+    return sizeDetail;
+  }
 }

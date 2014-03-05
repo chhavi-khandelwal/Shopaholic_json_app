@@ -3,7 +3,6 @@ $(document).ready(function() {
   productDashBoard.bindEvents();
 
   $('#main-container').on('click', '#add-cart', function() {
-    console.log("a")
     if($('.size-all.selected').length == 1)
     {
       $.ajax({
