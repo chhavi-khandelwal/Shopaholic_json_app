@@ -3,8 +3,7 @@
 }
 
 .panel-image {
-  width: 720px;
-  height: 688px;
+  width: 220%;
 }
 
 
@@ -22,6 +21,14 @@
   margin-left: 5%;
   margin-right: 5%;
   border-bottom: solid 2px #C54E4E;
+}
+
+.sold-out {
+  width: 100px;
+  height: 100px;
+  display: block;
+  position: absolute;
+  margin-top: -200px;
 }
 
 .site-name, .site-name:hover, .site-name:visited {

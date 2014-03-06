@@ -151,11 +151,27 @@
 
 .size-all {
   background-color: #E6E4E4;
-  border: 1px solid #ADACAC;
   display: inline;
   padding: 5%;
+  width: 20%;
+  text-align: center;
+  overflow: hidden;
+}
+
+#add-cart
+{
+  margin-left: 10%;
 }
 
 .add-btn {
 
+}
+
+.size-all.disabled
+{
+  background: url('wrong.png');
+  background-repeat: no-repeat;
+  opacity: 0.7;
+  background-position: 10px 0px;
+  background-size: 40px 40px;
 }

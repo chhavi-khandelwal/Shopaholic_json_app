@@ -34,7 +34,7 @@ function CategoryProduct() {
   }
 
   this.getMinPrice = function(color) {
-    min = Number(color.sizes[0].price)
+    var min = Number(color.sizes[0].price);
     for(size_key in color.sizes)
     {
       if(color.sizes[size_key].price < min)
@@ -43,20 +43,41 @@ function CategoryProduct() {
     return min;
   }
 
+  this.addPolling = function() {
+    setTimeout(function() { categoryProduct.getProducts(); }, 5000);
+  }
+
   this.getProducts = function(event) {
     event.preventDefault();
     $.ajax({
       url: $(this).attr('href'),
       dataType: 'json'
-    }).complete(function(data) {
-      var response = data.responseJSON;
+    }).done(function(response) {
+      var size_flag = response.size_flag;
       var display_container = $('<div>', { id:'display-container', class:'span8' } );
       $('#main-container').html(display_container);
       display_container.append($('<div>', { id: 'latest-products-container' }));
       var filterElements = categoryProduct.getDetails(response);
+      categoryProduct.checkSoldOut(size_flag);
       categoryProduct.displayFilters(filterElements);
-    });
+    }).complete(function() {
+        categoryProduct.addPolling();
+      });
   }
+
+  this.checkSoldOut = function(size_flag) {
+    for (var key in size_flag) {
+      var latest_product = $('#product_' + key);
+      if (!size_flag[key]) {
+        latest_product.find('.latest-products-image').append($('<img>', {class: 'sold-out', 'src': '/assets/sold_out.jpg'}));
+      }
+      else {
+        p = new Product();
+        latest_product.find('.quick-view.btn').on('click', p.viewProduct );
+      }
+    }
+  }
+
 
   this.getDetails = function(response) {
     var products = response.products;
@@ -94,11 +115,11 @@ function CategoryProduct() {
   }
 
   this.createLatestProductContainer = function(product, color) {
-    return ($('<div>',{ 'class': "latest-products", 'id': "product_" + product['id'], 'data-color':  color.name, 'data-brand': product.brand.name, 'data-price': categoryProduct.getMinPrice(color) }));
+    return ($('<div>',{ 'class': "latest-products", 'id': "product_" + color['id'], 'data-color':  color.name, 'data-brand': product.brand.name, 'data-price': categoryProduct.getMinPrice(color) }));
   }
 
   this.displayProductImage = function(product, color, images) {
-    img_container.append($('<img>', {class: 'latest-color-image', 'src': images[color.id]})).append($('<a/>', {class: 'quick-view visibility btn', href: ('/products/' + product.id + '/colors/' + color.id )})
+    img_container.append($('<img>', {class: 'latest-color-image', 'src': images[color.id]})).append($('<a/>', {class: 'quick-view visibility btn', 'data-href': ('/products/' + product.id + '/colors/' + color.id )})
         .html('Quick View'));
   }
 

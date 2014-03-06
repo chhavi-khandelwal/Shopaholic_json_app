@@ -60,8 +60,7 @@
       <div id="cart-count-container">
         <%= image_tag('cart.png', class: 'cart-image') %>
         <% if Cart.find_by(id: session[:cart_id]) %>
-          <a id="cart-link" href="<%= cart_path(Cart.find_by(id: session[:cart_id]))%>">Your Cart(<span id="cart-count">
-            <%= Cart.find_by(id: session[:cart_id]).try(:line_items).try(:count) %></span>)
+          <a id="cart-link" href="<%= cart_path(Cart.find_by(id: session[:cart_id]))%>">Your Cart(<span id="cart-count"><%=Cart.find_by(id: session[:cart_id]).try(:line_items).try(:count) %></span>)
           </a><br/>
         <% else %>
           <a id="cart-link" href="javascript:alert('cart not found');">Your Cart(<span id="cart-count"><%= Cart.find_by(id: session[:cart_id]).try(:line_items).try(:count) %></span>)

@@ -14,7 +14,7 @@ class Size < ActiveRecord::Base
 
   validates :name, uniqueness: { case_sensitive: false, scope: :color_id, message: "Size already exists for this color"  }
 
-  validates :quantity, numericality: { greater_than: 0 }, unless: "quantity.blank?"
+  validates :quantity, numericality: { greater_than_or_equal_to: 0 }, unless: "quantity.blank?"
 
   validates :price, numericality: { greater_than: 0 }, unless: "price.blank?"
 

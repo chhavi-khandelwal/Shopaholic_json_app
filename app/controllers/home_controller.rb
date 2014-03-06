@@ -14,7 +14,19 @@ class HomeController < ApplicationController
       product_hash[color.id] = color.product.as_json(only: [:id, :title, :description, :brand_id, :category_id])
       product_hash[color.id][:image] = color.thumbnail_in_focus(:medium)
       product_hash[color.id][:brand] = color.product.brand.name
+      product_hash[color.id][:size_quantity] = {}
+      color.sizes.each do |size|
+        product_hash[color.id][:size_quantity][size.id] = size.quantity
+        
+      end
+      quantity_hash = product_hash[color.id][:size_quantity]
+      if quantity_hash.select { |key, value| value > 0 }.empty?
+        product_hash[color.id][:size_flag] = false
+      else
+        product_hash[color.id][:size_flag] = true
+      end
     end
+
     product_hash
   end
 end

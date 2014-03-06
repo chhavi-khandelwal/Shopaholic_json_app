@@ -3,8 +3,7 @@ $(document).ready(function() {
   productDashBoard.bindEvents();
 
   $('#main-container').on('click', '#add-cart', function() {
-    if($('.size-all.selected').length == 1)
-    {
+    if($('.size-all.selected').length == 1) {
       $.ajax({
         url: $(this).data('href'),
         type: 'POST',
@@ -28,7 +27,6 @@ function ProductDashBoard() {
 
   this.bindEvents = function() {
     var $main_container = $('#main-container');
-
     $main_container.on('click', '.angle', function() { productDashBoard.changeFocussedImage($(this)) });
     $main_container.on('click', '.color-all', this.changeProductAngles);
     $main_container.on('click', '.size-all', function() { productDashBoard.setCurrentSizeAndPrice($(this)) });
@@ -44,14 +42,38 @@ function ProductDashBoard() {
 
   this.changeProductAngles = function() {
     var product_color = $(this);
-    productDashBoard.changeFocussedImage(product_color);
-    var product_angles = productDashBoard.setImageAngles(product_color);
     var sizes = product_color.data('sizes');
+    var size = 'none';
+    size = productDashBoard.setSize(product_color, size)
+    if(size == 'none') {
+      alert('color has no sizes');
+    }
+    else {
+      $('#selected-size-value').find('strong').html(size);
+      productDashBoard.setAngles(product_color, sizes);
+    }
+  }
+
+  this.setSize = function(product_color, size) {
+    var size_quantities = product_color.data('size-quantity');
+    for(i = 0; i < size_quantities.length; i++)
+    {
+      if(size_quantities[i] > min_quantity)
+      {
+        size = size_quantities[i];
+        break;
+      }
+    }
+    return size;
+  }
+
+  this.setAngles = function(product_color, sizes) {
+    var product_angles = productDashBoard.setImageAngles(product_color);
     var product_sizes = productDashBoard.setSizes(product_color, sizes);
     $('.product-angles').html(product_angles);
     $('.size-container').html(product_sizes);
-    $('#selected-size-value').find('strong').html(sizes[0]);
-    productDashBoard.setCurrentSizeAndPrice($('.size-all').first());
+    productDashBoard.changeFocussedImage(product_color);
+    productDashBoard.setCurrentSizeAndPrice($('.size-all').not('.disabled').first());
   }
 
   this.setImageAngles = function(product_color) {
@@ -68,15 +90,24 @@ function ProductDashBoard() {
 
   this.setSizes = function(product_color, sizes) {
     var size_ids = product_color.data('size-ids');
-    var size_prices = product_color.data('size-price');
-    var size_discounted_prices = product_color.data('size-discounted-price');
+    var size_quantities = product_color.data('size-quantity');
     var product_sizes = [];
     for(var i = 0; i < size_ids.length; i++) {
-      product_sizes.push($('<div/>').addClass('size-all')
-        .attr({ 'data-id': size_ids[i], 'data-price': size_prices[i], 'data-discounted-price': size_discounted_prices[i] })
-        .html("<span>" + sizes[i] + "</span>"));
+      var size_class ='size-all'
+      if(size_quantities[i] <= min_quantity)
+        size_class += ' disabled'
+      product_sizes.push(productDashBoard.getSizeContainer(product_color, sizes[i], size_class));
     }
     return product_sizes;
+  }
+
+  this.getSizeContainer = function(product_color, size, size_class) {
+    var size_ids = product_color.data('size-ids');
+    var size_prices = product_color.data('size-price');
+    var size_discounted_prices = product_color.data('size-discounted-price');
+    return ($('<div/>').addClass(size_class)
+    .attr({ 'data-id': size_ids[i], 'data-price': size_prices[i], 'data-discounted-price': size_discounted_prices[i] })
+    .html("<span>" + size + "</span>"));
   }
 
   this.setCurrentSizeAndPrice = function($current_size) {
@@ -90,9 +121,14 @@ function ProductDashBoard() {
   }
 
   this.getSize = function(selected_size) {
-    $('#selected-size-value').find('strong').html(selected_size.find('span').html());
-    selected_size.addClass('selected')
+    if(selected_size.hasClass('size-all disabled'))
+      alert('Size currently not available...!!')
+    else
+    {
+      $('#selected-size-value').find('strong').html(selected_size.find('span').html());
+      selected_size.addClass('selected')
       .siblings()
       .removeClass('selected');
+    } 
   }
 }
