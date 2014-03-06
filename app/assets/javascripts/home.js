@@ -1,29 +1,48 @@
 $(document).ready(function() {
   var product = new Product();
   product.getRecent();
-  product.bindEvents();
+  min_quantity = 0;
 });
 
 function Product() {
   var $main_container = $('#main-container');
   var product = this;
 
+  this.addPolling = function() {
+    setTimeout(function() { product.getRecent();}, 5000);
+  }
+
   this.getRecent = function() {
     if($('#new-today').length == 1) {
       $.ajax({
         url: $('#latest-products-container').data('href'),
-        dataType: 'json'
-      }).complete(function(data) {
-        var published_products = data.responseJSON.products;
+        dataType: 'json',
+        async: false, 
+      }).done(function(data) {
+        $('#latest-products-container').html('');
+        var published_products = data.products;
         for (var i in published_products) {
           product.getProductDetails(published_products, i);
+          product.checkSoldOut(published_products[i], i);
         }
+      }).complete(function() {
+        product.addPolling();
       });
     }    
   }
 
+  this.checkSoldOut = function(published_product, i) {
+    var latest_product = $('#product_color_' + i);
+    if (!published_product.size_flag) {
+      lastest_products_image = $('.latest-products-image').append($('<img>', {class: 'sold-out', 'src': '/assets/sold_out.jpg'}));
+    }
+    else {
+      latest_product.find('.quick-view.btn').on('click', this.viewProduct);
+    }
+  }
+
   this.getProductDetails = function(published_products, i) {
-    var latest_product = $('<div/>').addClass('latest-products').appendTo($('#latest-products-container'));
+    var latest_product = $('<div/>', {class: 'latest-products', id: ('product_color_' + i)}).appendTo($('#latest-products-container'));
     var product_image = $('<img>').attr('src', published_products[i].image);
     product.displayProductImage(product_image, latest_product);
     product.displayQuickViewBtn(published_products, i, product_image);
@@ -35,10 +54,6 @@ function Product() {
     $('<div/>').addClass('latest-products-image').html(product_image).appendTo(latest_product);
   }
 
-  this.bindEvents = function() {
-    $main_container.on('click', '.quick-view.btn', this.viewProduct);
-  }
-
   this.displayQuickViewBtn = function(published_products, i, product_image) {
     var quick_view = product.createQuickViewBtn(published_products, i);
     quick_view.insertAfter(product_image);
@@ -46,7 +61,7 @@ function Product() {
   }
 
   this.createQuickViewBtn = function(published_products, i) {
-    return ($('<a/>').attr({'href': '/products/' + published_products[i].id + '/colors/' + i, class: 'quick-view visibility btn'}).html('Quick View'));
+    return ($('<a/>').attr({'data-href': '/products/' + published_products[i].id + '/colors/' + i, class: 'quick-view visibility btn'}).html('Quick View'));
   }
 
   this.getContent = function(published_products, i, latest_products_desc) {
@@ -67,7 +82,7 @@ function Product() {
   this.viewProduct = function(event) {
     event.preventDefault();
     $.ajax({
-      url: $(this).attr('href'),
+      url: $(this).data('href'),
       dataType: 'json'
     }).complete(function(data) {
       $('#side-panel').remove();
@@ -92,7 +107,6 @@ function Product() {
   }
 
   this.appendContainer = function(nest, main) {
-    console.log("a")
     nest.appendTo(main);
   }
 
@@ -136,8 +150,12 @@ function Product() {
   }
 
   this.getFirstSize = function(response) {
-    var sizes = product.getSizes(response);
-    return sizes[0];
+    var sizes = product.getSizes(response); 
+    for(key in sizes)
+    {
+      if(sizes[key].quantity > min_quantity)
+        return sizes[key];
+    }
   }
 
   this.getCurrentProductSize = function(response, sizeNameTag) {
@@ -172,7 +190,10 @@ function Product() {
   }
 
   this.getSizeContainer = function(sizes, key) {
-    var sizeContainer = $('<div/>', { class: 'size-all', id: sizes[key].id, 'data-price': sizes[key].price, 'data-discounted-price': sizes[key].discounted_price });
+    var size_class ='size-all'
+    if(sizes[key].quantity <= min_quantity)
+      size_class += ' disabled' 
+    var sizeContainer = $('<div/>', { class: size_class, id: sizes[key].id, 'data-price': sizes[key].price, 'data-discounted-price': sizes[key].discounted_price });
     return sizeContainer;
   }
 
@@ -221,7 +242,7 @@ function Product() {
     var colorId = productColor.id;
     var productImages = images[colorId];
     $('<div/>', { class: 'color-all'})
-      .data({'images': product.getImages(productImages, 'small'), 'focussed-image': productImages['medium'][0], 'image-angles': product.getImages(productImages, 'medium'), 'sizes': product.getSizeDetails(productColor, 'name'), 'size-ids': product.getSizeDetails(productColor, 'id'), 'size-price': product.getSizeDetails(productColor, 'price'), 'size-discounted-price': product.getSizeDetails(productColor, 'discounted_price') }).append($('<img>', { 'src': productImages['small'][0], class: 'small-image'}))
+      .data({'images': product.getImages(productImages, 'small'), 'focussed-image': productImages['medium'][0], 'image-angles': product.getImages(productImages, 'medium'), 'sizes': product.getSizeDetails(productColor, 'name'), 'size-ids': product.getSizeDetails(productColor, 'id'), 'size-price': product.getSizeDetails(productColor, 'price'), 'size-discounted-price': product.getSizeDetails(productColor, 'discounted_price'), 'size-quantity': product.getSizeDetails(productColor, 'quantity') }).append($('<img>', { 'src': productImages['small'][0], class: 'small-image'}))
       .appendTo(availColorContainer);
 
   }
@@ -239,10 +260,7 @@ function Product() {
     var sizeDetail = [];
     for (var size_key in productColor.sizes) {
       var size = productColor.sizes[size_key];
-      if (Number(size[key]) == NaN)
-        sizeDetail.push(size[key]);
-      else
-        sizeDetail.push(Number(size[key]));
+      sizeDetail.push(size[key]);
     }
     return sizeDetail;
   }
