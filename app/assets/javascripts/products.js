@@ -1,25 +1,40 @@
 $(document).ready(function() {
   var productDashBoard = new ProductDashBoard();
   productDashBoard.bindEvents();
+  var cartProduct = new CartProduct();
+  cartProduct.bindEvents();
+});
 
-  $('#main-container').on('click', '#add-cart', function() {
+function CartProduct() {
+  var cartProduct = this;
+  this.bindEvents = function() {
+    $('#main-container').on('click', '#add-cart', this.addProductToCart);
+  }
+
+  this.addProductToCart = function() {
     if($('.size-all.selected').length == 1) {
-      $.ajax({
-        url: $(this).data('href'),
-        type: 'POST',
-        data: { 'size_id': $('.size-all.selected').data('id') },
-        dataType: 'json'
-      }).complete(function(response) {
-        response = response.responseJSON;
-        $('#cart-count').text(response.cart_size)
-        $('#cart-link').attr('href', '/carts/' + response.cart_id )
-      });
+      cartProduct.getProductResponse($(this));
     }
     else {
       $('#before-add').toggleClass('visibility').html('Select a size');
     }
-  });
-});
+  }
+
+  this.getProductResponse = function(cart) {
+    $.ajax({
+      url: cart.data('href'),
+      type: 'POST',
+      data: { 'size_id': $('.size-all.selected').attr('id') },
+      dataType: 'json'
+    }).complete(function(response) {
+      response = response.responseJSON;
+      $('#cart-count').text(response.cart_size);
+      $('#cart-link').attr('href', '/carts/' + response.cart_id );
+    });
+
+  }
+
+} 
 
 function ProductDashBoard() {
 
