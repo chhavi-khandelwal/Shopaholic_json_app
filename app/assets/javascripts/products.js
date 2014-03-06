@@ -60,6 +60,7 @@ function ProductDashBoard() {
     size = productDashBoard.setSize(product_color, size)
     if(size == 'none') {
       alert('color has no sizes');
+      $(this).append($('<img>', { class: 'gray', 'src': '/assets/gray.jpg'}))
     }
     else {
       $('#selected-size-value').find('strong').html(size);

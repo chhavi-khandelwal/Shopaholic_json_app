@@ -149,6 +149,16 @@
   margin-left: 5%; 
 }
 
+.gray {
+  width: 80px;
+  height: 75px;
+  position: absolute;
+  opacity: 0.4;
+  filter: alpha(opacity=40);
+  margin-left: -70px;
+  margin-top: -5px;
+}
+
 .size-all {
   background-color: #E6E4E4;
   display: inline;
