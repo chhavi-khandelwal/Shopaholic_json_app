@@ -3,6 +3,7 @@ class CategoriesController < ApplicationController
   
   def show
     @products = @category.products.published
+    #FIXME_AB: This should not be done in controller, should be done in view file using jbuilder
     render json: { 
       products: @products.as_json(
         { include: { brand: { only: :name }, 
