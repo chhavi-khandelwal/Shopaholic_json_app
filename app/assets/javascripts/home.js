@@ -9,7 +9,7 @@ function Product() {
   var product = this;
 
   this.addPolling = function() {
-    setTimeout(function() { product.getRecent();}, 5000);
+    setTimeout(function() { product.getRecent();}, 40000);
   }
 
   this.getRecent = function() {
