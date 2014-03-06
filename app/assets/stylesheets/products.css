@@ -43,7 +43,7 @@
 }
 
 .angle {
-  border: 1px solid #ADACAC;
+  border: 2px solid #ADACAC;
   border-radius: 5px;
   margin-top: 5%;
   padding: 2%;
@@ -98,7 +98,7 @@
 
 .color-all {
   display: inline-block;
-  border: 1px solid #ADACAC;
+  border: 2px solid #ADACAC !important;
   border-radius: 2px;
   padding: 1%;
   margin-left: 0.5%;
@@ -143,7 +143,6 @@
 #discounted-price {
   display: block;
   color: #3A3A38;
-  font-weight: bold;
   font-size: 28px;
   font-family: serif; 
   padding: 2%;
@@ -162,10 +161,6 @@
 #add-cart
 {
   margin-left: 10%;
-}
-
-.add-btn {
-
 }
 
 .size-all.disabled
