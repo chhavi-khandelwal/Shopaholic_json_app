@@ -44,7 +44,7 @@ function CategoryProduct() {
   }
 
   this.addPolling = function() {
-    setTimeout(function() { categoryProduct.getProducts(); }, 5000);
+    setTimeout(function() { categoryProduct.getProducts(); }, 40000);
   }
 
   this.getProducts = function(event) {

@@ -5,6 +5,7 @@
   padding: 5%;
   width: 25%;
   vertical-align: top;
+  box-shadow: 0px 1px 5px 5px #ADACAC;
 }
 
 .product-angles {
@@ -42,7 +43,7 @@
 }
 
 .angle {
-  border: 1px solid #ADACAC;
+  border: 2px solid #ADACAC;
   border-radius: 5px;
   margin-top: 5%;
   padding: 2%;
@@ -97,7 +98,7 @@
 
 .color-all {
   display: inline-block;
-  border: 1px solid #ADACAC;
+  border: 2px solid #ADACAC !important;
   border-radius: 2px;
   padding: 1%;
   margin-left: 0.5%;
@@ -142,11 +143,20 @@
 #discounted-price {
   display: block;
   color: #3A3A38;
-  font-weight: bold;
   font-size: 28px;
   font-family: serif; 
   padding: 2%;
   margin-left: 5%; 
+}
+
+.gray {
+  width: 80px;
+  height: 75px;
+  position: absolute;
+  opacity: 0.4;
+  filter: alpha(opacity=40);
+  margin-left: -70px;
+  margin-top: -5px;
 }
 
 .size-all {
@@ -161,10 +171,6 @@
 #add-cart
 {
   margin-left: 10%;
-}
-
-.add-btn {
-
 }
 
 .size-all.disabled

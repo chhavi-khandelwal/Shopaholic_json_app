@@ -1,25 +1,38 @@
 $(document).ready(function() {
   var productDashBoard = new ProductDashBoard();
   productDashBoard.bindEvents();
+  var cartProduct = new CartProduct();
+  cartProduct.bindEvents();
+});
 
-  $('#main-container').on('click', '#add-cart', function() {
+function CartProduct() {
+  var cartProduct = this;
+  this.bindEvents = function() {
+    $('#main-container').on('click', '#add-cart', this.addProductToCart);
+  }
+
+  this.addProductToCart = function() {
     if($('.size-all.selected').length == 1) {
-      $.ajax({
-        url: $(this).data('href'),
-        type: 'POST',
-        data: { 'size_id': $('.size-all.selected').data('id') },
-        dataType: 'json'
-      }).complete(function(response) {
-        response = response.responseJSON;
-        $('#cart-count').text(response.cart_size)
-        $('#cart-link').attr('href', '/carts/' + response.cart_id )
-      });
+      cartProduct.getProductResponse($(this));
     }
     else {
       $('#before-add').toggleClass('visibility').html('Select a size');
     }
-  });
-});
+  }
+
+  this.getProductResponse = function(cart) {
+    $.ajax({
+      url: cart.data('href'),
+      type: 'POST',
+      data: { 'size_id': $('.size-all.selected').data('id') },
+      dataType: 'json'
+    }).complete(function(response) {
+      response = response.responseJSON;
+      $('#cart-count').text(response.cart_size);
+      $('#cart-link').attr('href', '/carts/' + response.cart_id );
+    });
+  }
+} 
 
 function ProductDashBoard() {
 
@@ -47,6 +60,7 @@ function ProductDashBoard() {
     size = productDashBoard.setSize(product_color, size)
     if(size == 'none') {
       alert('color has no sizes');
+      $(this).append($('<img>', { class: 'gray', 'src': '/assets/gray.jpg'}))
     }
     else {
       $('#selected-size-value').find('strong').html(size);
@@ -81,11 +95,16 @@ function ProductDashBoard() {
     var medium_images = product_color.data('image-angles');
     var product_angles = [];
     for(var i = 0; i < small_images.length; i++) {
-      product_angles.push($('<div/>').addClass('angle')
-        .attr('data-focussed-image', medium_images[i])
-        .html("<img src=" + small_images[i] + " class='small-image'>"));
+      product_angles.push(productDashBoard.getProductAngle(small_images[i], medium_images[i]));
     }
     return product_angles;
+  }
+
+  this.getProductAngle = function(small_image, medium_image) {
+    var productAngle = $('<div/>').addClass('angle')
+      .attr('data-focussed-image', medium_image)
+      .html("<img src=" + small_image + " class='small-image'>");
+    return productAngle;
   }
 
   this.setSizes = function(product_color, sizes) {
@@ -127,8 +146,8 @@ function ProductDashBoard() {
     {
       $('#selected-size-value').find('strong').html(selected_size.find('span').html());
       selected_size.addClass('selected')
-      .siblings()
-      .removeClass('selected');
+        .siblings()
+        .removeClass('selected');
     } 
   }
 }

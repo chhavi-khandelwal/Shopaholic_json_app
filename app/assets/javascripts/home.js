@@ -9,7 +9,7 @@ function Product() {
   var product = this;
 
   this.addPolling = function() {
-    setTimeout(function() { product.getRecent();}, 5000);
+    setTimeout(function() { product.getRecent();}, 40000);
   }
 
   this.getRecent = function() {
@@ -193,7 +193,7 @@ function Product() {
     var size_class ='size-all'
     if(sizes[key].quantity <= min_quantity)
       size_class += ' disabled' 
-    var sizeContainer = $('<div/>', { class: size_class, id: sizes[key].id, 'data-price': sizes[key].price, 'data-discounted-price': sizes[key].discounted_price });
+    var sizeContainer = $('<div/>', { class: size_class, 'data-id': sizes[key].id, 'data-price': sizes[key].price, 'data-discounted-price': sizes[key].discounted_price });
     return sizeContainer;
   }
 
