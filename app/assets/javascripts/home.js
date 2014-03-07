@@ -1,12 +1,13 @@
 $(document).ready(function() {
-  var product = new Product();
-  product.getRecent();
+  var homeProduct = new HomeProductGrid();
+  products = '';
+  homeProduct.getRecent();
   min_quantity = 0;
 });
 
-function Product() {
+function HomeProductGrid() {
   var $main_container = $('#main-container');
-  var product = this;
+  var homeProduct = this;
 
   this.addPolling = function() {
     setTimeout(function() { product.getRecent();}, 40000);
@@ -20,57 +21,67 @@ function Product() {
         async: false, 
       }).done(function(data) {
         $('#latest-products-container').html('');
-        var published_products = data.products;
-        for (var i in published_products) {
-          product.getProductDetails(published_products, i);
-          product.checkSoldOut(published_products[i], i);
+        products = data;
+        for (var i in products) {
+          var gridProduct = products[i];
+          homeProduct.displayProducts(gridProduct);
         }
       }).complete(function() {
-        product.addPolling();
+        homeProduct.addPolling();
       });
     }    
   }
 
-  this.checkSoldOut = function(published_product, i) {
-    var latest_product = $('#product_color_' + i);
-    if (!published_product.size_flag) {
-      lastest_products_image = $('.latest-products-image').append($('<img>', {class: 'sold-out', 'src': '/assets/sold_out.jpg'}));
-    }
-    else {
-      latest_product.find('.quick-view.btn').on('click', this.viewProduct);
+  this.displayProducts = function(product) {
+    var productColors = product.colors;
+    for (var color_key in product.colors) {
+      var color = productColors[color_key];
+      this.getProductDetails(product, color);
+      this.checkSoldOut(color);
     }
   }
 
-  this.getProductDetails = function(published_products, i) {
-    var latest_product = $('<div/>', {class: 'latest-products', id: ('product_color_' + i)}).appendTo($('#latest-products-container'));
-    var product_image = $('<img>').attr('src', published_products[i].image);
-    product.displayProductImage(product_image, latest_product);
-    product.displayQuickViewBtn(published_products, i, product_image);
+
+  this.checkSoldOut = function(color) {
+    var latest_product = $('#product_color_' + color.id);
+    if (color.quantity_flag) {
+      var quickViewBtn = latest_product.find('.quick-view');
+      quickViewBtn.on('click', this.viewProduct);
+    }
+    else {
+      latest_product.find('.latest-products-image').append($('<img>', {class: 'sold-out', 'src': '/assets/sold_out.jpg'}));
+    }
+  }
+
+  this.getProductDetails = function(product, color) {
+    var latest_product = $('<div/>', {class: 'latest-products', id: ('product_color_' + color.id)}).appendTo($('#latest-products-container'));
+    var product_image = $('<img>').attr('src', color.images[0]['medium']);
+    this.displayProductImage(product_image, latest_product);
+    this.displayQuickViewBtn(product, color, product_image);
     var latest_products_desc = $('<div/>').addClass('latest-products-desc').appendTo(latest_product);
-    product.getContent(published_products, i, latest_products_desc);
+    this.getContent(product, latest_products_desc);
   }
 
   this.displayProductImage = function(product_image, latest_product) {
     $('<div/>').addClass('latest-products-image').html(product_image).appendTo(latest_product);
   }
 
-  this.displayQuickViewBtn = function(published_products, i, product_image) {
-    var quick_view = product.createQuickViewBtn(published_products, i);
+  this.displayQuickViewBtn = function(product, color, product_image) {
+    var quick_view = this.createQuickViewBtn(product, color);
     quick_view.insertAfter(product_image);
-
   }
 
-  this.createQuickViewBtn = function(published_products, i) {
-    return ($('<a/>').attr({'data-href': '/products/' + published_products[i].id + '/colors/' + i, class: 'quick-view visibility btn'}).html('Quick View'));
+  this.createQuickViewBtn = function(product, color) {
+    return ($('<a/>').attr({'data-href': '/products/' + product.id + '/colors/' + color.id, class: 'quick-view visibility btn'}).html('Quick View'));
   }
 
-  this.getContent = function(published_products, i, latest_products_desc) {
-    var title = published_products[i]['title'];
-    product.getContentContainer(title, latest_products_desc);
-    var description = (published_products[i]['description'].substring(0,20) + '...');
-    product.getContentContainer(description, latest_products_desc);
-    var brand = published_products[i]['brand'];
-    product.getContentContainer(brand, latest_products_desc);
+  this.getContent = function(product, latest_products_desc) {
+    var title = product['title'];
+    this.getContentContainer(title, latest_products_desc);
+    var description = (product['description'].substring(0,20) + '...');
+    this.getContentContainer(description, latest_products_desc);
+    var brand = product.brand.name;
+    this.getContentContainer(brand, latest_products_desc);
   }
 
   this.getContentContainer = function(value, latest_products_desc) {
@@ -81,41 +92,68 @@ function Product() {
 
   this.viewProduct = function(event) {
     event.preventDefault();
-    $.ajax({
-      url: $(this).data('href'),
-      dataType: 'json'
-    }).complete(function(data) {
-      $('#side-panel').remove();
-      var response = data.responseJSON;
-      var productFocus = product.getProductFocus();
-      product.displayProductDetails(response, productFocus);
-      $main_container.html(productFocus);
-    });
+    var clickedQuickView = $(this);
+    var url = $(this).data('href').split('/');
+    $('#side-panel').remove();
+    var displayedProduct = homeProduct.getDisplayedProduct(url);
+    var displayedColor = homeProduct.getDisplayedColor(displayedProduct, url);
+    var productFocus = homeProduct.getProductFocus();
+    homeProduct.displayProductDetails(displayedProduct, displayedColor, productFocus);
+    $main_container.html(productFocus);
+  }
+// ***************************************************************************
+  
+  this.getDisplayedColor = function(displayedProduct, url) {
+    var colorId = url[4];
+    var displayedColors = displayedProduct.colors;
+    var displayedColor = '';
+    for (var color_key in displayedColors) {
+      var currentColor = displayedColors[color_key];
+      if (currentColor.id == colorId) {
+        displayedColor = currentColor; 
+        break;
+      }
+    }
+    return displayedColor;
   }
 
-  this.displayProductDetails = function(response, productFocus) {
+  this.getDisplayedProduct = function(url) {
+    var productId = url[2];
+    var displayedProduct = ''; 
+    for (var product_key in products) {
+      var currentProduct = products[product_key];
+      if (currentProduct.id == productId) {
+        displayedProduct = currentProduct; 
+        break;
+      }
+    }
+    return displayedProduct;
+  }
+
+  //calls all the functions that display product
+  this.displayProductDetails = function(displayedProduct, displayedColor, productFocus) {
     var productAngles = $('<div/>', {class: 'product-angles'}).appendTo(productFocus);
-    product.getImageViews(response, productAngles);
-    var productInFocus = product.displayProductInFocus(response,  productFocus);
-    product.appendContainer(productInFocus, productFocus);
-    var offeredSizes = product.getOfferedSizes(response);
-    product.appendContainer(offeredSizes, productFocus);
-    var productDetails = product.getProductDescription(response);
-    product.appendContainer(productDetails, productFocus);
-    var availableColors = product.getAvailableColors(response);
-    product.appendContainer(availableColors, productFocus);
+    homeProduct.getImageViews(displayedColor, productAngles);
+    var productInFocus = homeProduct.displayProductInFocus(displayedColor.images);
+    homeProduct.appendContainer(productInFocus, productFocus);
+    var offeredSizes = homeProduct.getOfferedSizes(displayedColor);
+    homeProduct.appendContainer(offeredSizes, productFocus);
+    var productDetails = homeProduct.getProductDescription(displayedProduct);
+    homeProduct.appendContainer(productDetails, productFocus);
+    var availableColors = homeProduct.getAvailableColors(displayedProduct);
+    homeProduct.appendContainer(availableColors, productFocus);
   }
 
   this.appendContainer = function(nest, main) {
     nest.appendTo(main);
   }
 
-  this.getImageViews = function(response, productAngles) {
-    var current_color = response.current_color['id'];
-    var images = response.images;
-    for (var image_key in images[current_color]['small']) {
-      var image = product.getCurrentProductImage(response, image_key, 'medium');
-      $('<div/>', {class: 'angle', 'data-focussed-image': images[current_color]['medium'][image_key] }).append(image.addClass('small-image')).appendTo(productAngles);
+  this.getImageViews = function(displayedColor, productAngles) {
+    var current_color = displayedColor['id'];
+    var images = displayedColor.images;
+    for (var image_key in images) {
+      var image = homeProduct.getCurrentProductImage(images[image_key]['medium']);
+      $('<div/>', {class: 'angle', 'data-focussed-image': images[image_key]['medium'] }).append(image.addClass('small-image')).appendTo(productAngles);
     }
   }
 
@@ -125,101 +163,84 @@ function Product() {
     return productFocus;    
   }
 
-  this.displayProductInFocus = function(response,  productFocus) {
-    var image = product.getCurrentProductImage(response, 0, 'medium')
+  this.displayProductInFocus = function(images) {
+    var image = homeProduct.getCurrentProductImage(images[0]['medium']);
     var productInFocus = $('<div/>', { class: 'product-in-focus' }).append(image);
     return productInFocus;
   }
 
-  this.getCurrentProductImage = function(response, key, size) {
-    var current_color = response.current_color['id'];
-    var images = response.images;
-    var image = $('<img>', {'src': images[current_color][size][key]});
+  this.getCurrentProductImage = function(image) {
+    var image = $('<img>', {'src': image});
     return image;
   }
 
-  this.getOfferedSizes = function(response) {
+  this.getOfferedSizes = function(displayedColor) {
     var sizeNameTag = $('<div/>', { id: 'size-name', class: 'block-tile'});
     var offeredSizesContainer = $('<div/>', { id: 'offer-sizes' }).append(sizeNameTag);
     sizeNameTag.append($('<p/>', { class: 'inline-tile' }).html('SELECT SIZE - '))
-    product.getCurrentProductSize(response, sizeNameTag);
-    product.displaySizeContainer(response, offeredSizesContainer);
-    var sizePrice = product.getPrice(response);
+    homeProduct.getCurrentProductSize(displayedColor, sizeNameTag);
+    homeProduct.displaySizeContainer(displayedColor, offeredSizesContainer);
+    var sizePrice = homeProduct.getPrice(displayedColor);
     sizePrice.appendTo(offeredSizesContainer);
     return offeredSizesContainer;
   }
 
-  this.getFirstSize = function(response) {
-    var sizes = product.getSizes(response); 
-    for(key in sizes)
-    {
+  this.getFirstSize = function(displayedColor) {
+    var sizes = displayedColor.sizes; 
+    for(key in sizes) {
       if(sizes[key].quantity > min_quantity)
         return sizes[key];
     }
   }
 
-  this.getCurrentProductSize = function(response, sizeNameTag) {
-    var currentSize = product.getFirstSize(response);
+  this.getCurrentProductSize = function(displayedColor, sizeNameTag) {
+    var currentSize = homeProduct.getFirstSize(displayedColor);
     currentSize = currentSize.name;
     $('<span/>', {id: 'selected-size-value', class:'inline-tile'}).append($('<strong/>')
       .html(currentSize))
       .appendTo(sizeNameTag);
   }
 
-  this.getSizes = function(response) {
-    var currentProductColors = response.products.colors;
-    var current_color = response.current_color['id'];
-    var sizes;
-    for (var key in currentProductColors) {
-      if (currentProductColors[key].id == current_color) {
-        sizes = currentProductColors[key]['sizes'];
-        break;
-      }
-    }
-    return sizes;
-  }
-
-  this.displaySizeContainer = function(response, offeredSizesContainer) {
-    var sizes = product.getSizes(response);
+  this.displaySizeContainer = function(displayedColor, offeredSizesContainer) {
+    var sizes = displayedColor.sizes;
     var sizeContainer = $('<div/>', { class: 'size-container' }).appendTo(offeredSizesContainer);
     for (var key in sizes) {
-      var size = product.getSizeContainer(sizes, key);
+      var size = homeProduct.getSizeContainer(sizes, key);
       size.appendTo(sizeContainer)
-      .append($('<span/>').html(sizes[key].name));
+        .append($('<span/>').html(sizes[key].name));
     }
   }
 
   this.getSizeContainer = function(sizes, key) {
     var size_class ='size-all'
-    if(sizes[key].quantity <= min_quantity)
-      size_class += ' disabled' 
+    if(sizes[key].quantity == min_quantity)
+      size_class += ' disabled'; 
     var sizeContainer = $('<div/>', { class: size_class, 'data-id': sizes[key].id, 'data-price': sizes[key].price, 'data-discounted-price': sizes[key].discounted_price });
     return sizeContainer;
   }
 
-  this.getPrice = function(response) {
+  this.getPrice = function(displayedColor) {
     var sizePrice = $('<div/>', { id: 'size-price' });
-    var size = product.getFirstSize(response);
+    var size = homeProduct.getFirstSize(displayedColor);
     sizePrice.append($('<p/>', {id: 'real-price'}).html('Real ' + size.price))
       .append($('<p/>', {id: 'discounted-price'}).html('Discounted ' + size.discounted_price));
     return sizePrice;
   }
 
-  this.getProductDescription = function(response) {
-    var current_product = response.products;
+  this.getProductDescription = function(displayedProduct) {
     var detailsContainer = $('<div/>', { id: 'details-tab-container' });
     $('<div/>', { id: 'details-tab' }).append($('<p/>').html('Details'))
       .appendTo(detailsContainer);
     var contentTab = $('<div/>', { id: 'details-tab-content' }).appendTo(detailsContainer);
-    product.getBasicDetails(current_product, contentTab);
+    homeProduct.getBasicDetails(displayedProduct, contentTab);
     $('<div/>', {class: 'cart-btn'}).append($('<a/>', { class: 'btn btn-success add-btn', id: 'add-cart', 'data-href': '/carts'}).html('Add To Cart')).appendTo(detailsContainer);
     return detailsContainer;
   }
 
-  this.getBasicDetails = function(current_product, contentTab) {
-    $('<div/>').append($('<h5/>').html(current_product.title)).appendTo(contentTab);
-    $('<div/>').append(product.getContentTag(current_product.description)).appendTo(contentTab);
-    $('<div/>').append(product.getContentTag(current_product.brand['name'])).appendTo(contentTab);
+  this.getBasicDetails = function(displayedProduct, contentTab) {
+    $('<div/>').append($('<h5/>').html(displayedProduct.title)).appendTo(contentTab);
+    $('<div/>').append(homeProduct.getContentTag(displayedProduct.description)).appendTo(contentTab);
+    $('<div/>').append(homeProduct.getContentTag(displayedProduct.brand['name'])).appendTo(contentTab);
   }
 
   this.getContentTag = function(textVal) {
@@ -227,31 +248,28 @@ function Product() {
     return contentTag;
   }
 
-  this.getAvailableColors = function(response) {
+  this.getAvailableColors = function(displayedProduct) {
     var availColorContainer = $('<div/>', { id: 'color-avail' });
-    var productColors = response.products.colors;
-    var images = response.images;
+    var productColors = displayedProduct.colors;
     for (var key in productColors) {
       var productColor = productColors[key];
-      product.displayAvailableColor(productColor, availColorContainer, images);
+      homeProduct.displayAvailableColor(productColor, availColorContainer);
     }
     return availColorContainer;
   }
 
-  this.displayAvailableColor = function(productColor, availColorContainer, images) {
-    var colorId = productColor.id;
-    var productImages = images[colorId];
+  this.displayAvailableColor = function(productColor, availColorContainer) {
+    var productImages = productColor.images;
     $('<div/>', { class: 'color-all'})
-      .data({'images': product.getImages(productImages, 'small'), 'focussed-image': productImages['medium'][0], 'image-angles': product.getImages(productImages, 'medium'), 'sizes': product.getSizeDetails(productColor, 'name'), 'size-ids': product.getSizeDetails(productColor, 'id'), 'size-price': product.getSizeDetails(productColor, 'price'), 'size-discounted-price': product.getSizeDetails(productColor, 'discounted_price'), 'size-quantity': product.getSizeDetails(productColor, 'quantity') }).append($('<img>', { 'src': productImages['small'][0], class: 'small-image'}))
+      .data({'images': homeProduct.getImages(productImages, 'small'), 'focussed-image': productImages[0]['medium'], 'image-angles': homeProduct.getImages(productImages, 'medium'), 'sizes': homeProduct.getSizeDetails(productColor, 'name'), 'size-ids': homeProduct.getSizeDetails(productColor, 'id'), 'size-price': homeProduct.getSizeDetails(productColor, 'price'), 'size-discounted-price': homeProduct.getSizeDetails(productColor, 'discounted_price'), 'size-quantity': homeProduct.getSizeDetails(productColor, 'quantity') }).append($('<img>', { 'src': productImages[0]['small'], class: 'small-image'}))
       .appendTo(availColorContainer);
 
   }
 
   this.getImages = function(images, size) {
-    var images = images[size];
     var img_collection = [];
     for (var key in images) {
-      img_collection.push(images[key]);
+      img_collection.push(images[key][size]);
     }
     return img_collection;
   }

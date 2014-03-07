@@ -49,77 +49,74 @@ function CategoryProduct() {
 
   this.getProducts = function(event) {
     event.preventDefault();
-    $.ajax({
-      url: $(this).attr('href'),
-      dataType: 'json'
-    }).done(function(response) {
-      var size_flag = response.size_flag;
-      var display_container = $('<div>', { id:'display-container', class:'span8' } );
-      $('#main-container').html(display_container);
-      display_container.append($('<div>', { id: 'latest-products-container' }));
-      var filterElements = categoryProduct.getDetails(response);
-      categoryProduct.checkSoldOut(size_flag);
-      categoryProduct.displayFilters(filterElements);
-    }).complete(function() {
-        categoryProduct.addPolling();
-      });
-  }
-
-  this.checkSoldOut = function(size_flag) {
-    for (var key in size_flag) {
-      var latest_product = $('#product_' + key);
-      if (!size_flag[key]) {
-        latest_product.find('.latest-products-image').append($('<img>', {class: 'sold-out', 'src': '/assets/sold_out.jpg'}));
-      }
-      else {
-        p = new Product();
-        latest_product.find('.quick-view.btn').on('click', p.viewProduct );
-      }
-    }
-  }
-
-
-  this.getDetails = function(response) {
-    var products = response.products;
-    var images = response.images;
+    var categoryId = $(this).attr('id');
     var productColors = [];
     var productBrands = [];
-    for(key in products) {
+    categoryProduct.displayContainerGrid();
+    for (var key in products) {
       var product = products[key];
-      productBrands.push(product.brand.name);
-      for(color_key in product.colors) {
-        var color = product.colors[color_key];
-        if(color.published == true) {
+      if (product.category.id == categoryId) {
+        productBrands.push(product.brand.name);
+        var colors = product.colors;
+        for (var color_key in colors) {
+          var color = colors[color_key];
           productColors.push(color.name);
-          categoryProduct.displayProducts(product, color, images);
+          categoryProduct.displayProducts(color, product);
+          categoryProduct.checkSoldOut(product.colors);
         }
       }
     }
-    var filterElements = categoryProduct.getFilterElementsHash(productColors, productBrands);
-    return filterElements;
+    categoryProduct.displayFilters(productColors, productBrands);
   }
 
+  this.displayFilters = function(productColors, productBrands) {
+    var filterElements = categoryProduct.getFilterElementsHash(productColors, productBrands);
+    categoryProduct.getFilters(filterElements);
+  }
+  
+  this.displayContainerGrid = function() {
+    var display_container = $('<div>', { id:'display-container', class:'span8' } );
+    $('#main-container').html(display_container);
+    display_container.append($('<div>', { id: 'latest-products-container' }));
+  }
+
+  this.checkSoldOut = function(colors) {
+    for (var key in colors) {
+      var color = colors[key];
+      var latest_product = $('#product_' + color.id);
+      if (color.quantity_flag) {
+        var homeproduct = new HomeProductGrid();
+        latest_product.find('.quick-view.btn').on('click', homeproduct.viewProduct );
+      }
+      else {
+        latest_product.find('.latest-products-image').append($('<img>', {class: 'sold-out', 'src': '/assets/sold_out.jpg'}));
+      }
+    }
+  }
+
+  
   this.getFilterElementsHash = function(productColors, productBrands) {
     var productColors = $.unique(productColors);
     var productBrands = $.unique(productBrands);
     return ({ 'color': productColors, 'brand': productBrands });
   }
 
-  this.displayProducts = function(product, color, images) {
+  this.displayProducts = function(color, product) {
+    var image = color.images[0]['medium'];
     var latest_product = categoryProduct.createLatestProductContainer(product, color);
     $('#latest-products-container').append(latest_product);
     img_container = $('<div>', {class: 'latest-products-image'});
     latest_product.appendTo($('#latest-products-container')).append(img_container);
-    categoryProduct.displayProductImage(product, color, images);
+    categoryProduct.displayProductImage(product, color, image);
     latest_product.append(categoryProduct.getDescription(product, latest_product));
   }
 
   this.createLatestProductContainer = function(product, color) {
-    return ($('<div>',{ 'class': "latest-products", 'id': "product_" + color['id'], 'data-color':  color.name, 'data-brand': product.brand.name, 'data-price': categoryProduct.getMinPrice(color) }));
+    return ($('<div>',{ 'class': "latest-products", 'id': "product_" + color['id'], 'data-color':  color.name, 'data-brand': product.brand.name, 'data-price': this.getMinPrice(color) }));
   }
 
-  this.displayProductImage = function(product, color, images) {
-    img_container.append($('<img>', {class: 'latest-color-image', 'src': images[color.id]})).append($('<a/>', {class: 'quick-view visibility btn', 'data-href': ('/products/' + product.id + '/colors/' + color.id )})
+  this.displayProductImage = function(product, color, image) {
+    img_container.append($('<img>', {class: 'latest-color-image', 'src': image})).append($('<a/>', {class: 'quick-view visibility btn', 'data-href': ('/products/' + product.id + '/colors/' + color.id )})
         .html('Quick View'));
   }
 
@@ -130,8 +127,8 @@ function CategoryProduct() {
     return latest_products_desc;
   }
 
-  this.displayFilters = function(filterElements) {
-    var filters = ['color', 'brand']
+  this.getFilters = function(filterElements) {
+    var filters = ['color', 'brand'];
     var filterContainer = $('<div/>', { id: 'filters', class: 'span2'});
     for (var i = 0, len = filters.length; i < len; i++) {
       var filterHeading = categoryProduct.getFilterHead(filters[i], filterContainer);

@@ -26,5 +26,18 @@ class Color < ActiveRecord::Base
     end
     true
   end
+
+  def quantity_flag
+    size_hash = {}
+    sizes.each do |size|
+      size_hash[size.id] = size.quantity
+    end
+    if size_hash.select { |key, value| value > 0 }.empty?
+      quantity_flag = false
+    else
+      quantity_flag = true
+    end
+    quantity_flag
+  end
   
 end
