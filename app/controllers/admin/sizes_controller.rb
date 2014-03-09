@@ -9,6 +9,7 @@ class Admin::SizesController < Admin::AdminsController
   end
 
   def create
+    #FIXME_AB: What if color not found with the id
     color = Color.find_by(id: size_params[:color_id])
     @size = color.sizes.build(size_params)
     if @size.save

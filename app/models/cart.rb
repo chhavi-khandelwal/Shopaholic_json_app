@@ -1,3 +1,4 @@
+#FIXME_AB: I would prefer to name this as Order. 
 class Cart < ActiveRecord::Base
   has_many :line_items, dependent: :destroy
   has_many :sizes, through: :line_items
