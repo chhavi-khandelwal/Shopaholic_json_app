@@ -24,11 +24,11 @@
 }
 
 .sold-out {
-  width: 100px;
-  height: 100px;
+  width: 70px;
+  height: 70px;
   display: block;
   position: absolute;
-  margin-top: -200px;
+  margin-top: -195px;
 }
 
 .site-name, .site-name:hover, .site-name:visited {
