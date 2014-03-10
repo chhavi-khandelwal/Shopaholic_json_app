@@ -24,6 +24,7 @@ $(document).ready(function() {
   $('.row-fluid').css('min-height', $(window).height());
   var categoryProduct = new CategoryProduct();
   categoryProduct.bindEvents();
+  categoryProduct.extractData();
 });
 
 function CategoryProduct() {
@@ -31,6 +32,72 @@ function CategoryProduct() {
 
   this.bindEvents = function() {
     $('.link-tile.category-tile').click(this.getProducts);
+    window.onhashchange = function() {
+      categoryProduct.extractData();
+    }
+  }
+
+  this.extractData = function() {
+    var window_params = window.location.hash.split('-')
+    var controller = window_params[0];
+    action_id = window_params[1];
+    var hash_params = '', color_filters = [], brand_filters = [];
+    if (window_params[2]) {
+      hash_params = window_params[2];
+    }
+    switch(controller) {
+      case '#categories':
+        if ($('.link-tile.category-tile[id=' + action_id + ']').length == 1 && !hash_params.length) {
+          categoryProduct.getProducts();
+        } 
+        else if (hash_params.length) {
+          categoryProduct.getProducts(null, 'no');
+          color_filters = categoryProduct.getFilterParams(hash_params);
+          categoryProduct.checkFilters('color', color_filters);
+          productGrid.filterProducts('no');
+        }
+        break;
+      case '#products':
+        homeProduct.viewProduct(null, 'no');
+    }
+  }
+
+  this.getFilterParams = function(hash_params) {
+      var color_params = '', color_filters = [], brand_filters = [];
+    if (hash_params.indexOf('brand') != -1) {
+      var filter_params =  hash_params.split('&');
+      if (hash_params.indexOf('color') != -1) {
+        color_params = filter_params[1].split('|')[1];
+        color_filters.push(color_params);
+      }
+      if (color_params.indexOf(',') != -1) {
+        color_filters = color_params.split(',');
+      }
+      brand_filters = categoryProduct.extractFiltersFromHash(filter_params[0]);
+      categoryProduct.checkFilters('brand', brand_filters);
+    }
+    else {
+       color_filters = categoryProduct.extractFiltersFromHash(hash_params);
+    }
+    return color_filters;
+  }
+
+  this.extractFiltersFromHash = function(hash_params) {
+    var tag_filters = [];
+    var filter_hash_params = hash_params.split('|')[1];
+    tag_filters.push(filter_hash_params);
+    if (filter_hash_params.indexOf(',') != -1)
+      tag_filters = filter_hash_params.split(',');
+    return tag_filters;
+  }
+
+  this.checkFilters = function(filter, hash_filters) {
+    $('#' + filter + '-filters').find('input[type="checkbox"]').each(function(index) {
+      if ($.inArray($(this).attr('value'), hash_filters) != -1)
+        $(this).prop('checked', true);
+      else
+        $(this).prop('checked', false);
+    });
   }
 
   this.getMinPrice = function(color) {
@@ -47,9 +114,14 @@ function CategoryProduct() {
     setTimeout(function() { categoryProduct.getProducts(); }, 40000);
   }
 
-  this.getProducts = function(event) {
-    event.preventDefault();
-    var categoryId = $(this).attr('id');
+  this.getProducts = function(event, change_hash) {
+    var change_hash = change_hash || 'yes'
+    if(event)
+      event.preventDefault();
+    var hash = '';
+    var categoryId = $(this).attr('id') || action_id;
+    if(change_hash == 'yes')
+      window.location.hash = '#categories-' + categoryId;
     var productColors = [];
     var productBrands = [];
     categoryProduct.displayContainerGrid();
@@ -134,14 +206,14 @@ function CategoryProduct() {
       var filterHeading = categoryProduct.getFilterHead(filters[i], filterContainer);
       var filterCollection = $('<div/>', {id: (filters[i] + '-filters')}).insertAfter(filterHeading);
       var filterTag = filterElements[filters[i]];
-      categoryProduct.displayFilterTags(filterTag, filterCollection);
+      categoryProduct.displayFilterTags(filters[i], filterTag, filterCollection);
     }
     $('<div/>', { id: 'side-panel' }).appendTo('#main-container').append(filterContainer);
   }
 
-  this.displayFilterTags = function(filterTag, filterCollection) {
+  this.displayFilterTags = function(filter, filterTag, filterCollection) {
     for (var j = 0, jLen = filterTag.length; j < jLen; j++) {
-      $('<div/>', {class: 'filterElement'}).append($('<input>', {'type': 'checkbox', 'value': filterTag[j]}))
+      $('<div/>', {class: 'filterElement'}).append($('<input>', {'type': 'checkbox', 'value': filterTag[j], 'data-filter': filter}))
         .append($('<span/>', {class: 'filterName'}).html(filterTag[j]))
         .appendTo(filterCollection);
     }

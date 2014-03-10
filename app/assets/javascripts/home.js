@@ -1,5 +1,5 @@
 $(document).ready(function() {
-  var homeProduct = new HomeProductGrid();
+  homeProduct = new HomeProductGrid();
   products = '';
   homeProduct.getRecent();
   min_quantity = 0;
@@ -10,7 +10,7 @@ function HomeProductGrid() {
   var homeProduct = this;
 
   this.addPolling = function() {
-    setTimeout(function() { product.getRecent();}, 40000);
+    setTimeout(function() { homeProduct.getRecent(); }, 40000);
   }
 
   this.getRecent = function() {
@@ -22,9 +22,13 @@ function HomeProductGrid() {
       }).done(function(data) {
         $('#latest-products-container').html('');
         products = data;
-        for (var i in products) {
-          var gridProduct = products[i];
-          homeProduct.displayProducts(gridProduct);
+        var url_hash = window.location.hash.split('-')[0];
+        if (url_hash != '#products' && url_hash != '#categories')
+        {
+          for (var i in products) {
+            var gridProduct = products[i];
+            homeProduct.displayProducts(gridProduct);
+          }
         }
       }).complete(function() {
         homeProduct.addPolling();
@@ -90,16 +94,33 @@ function HomeProductGrid() {
       .appendTo(latest_products_desc);
   }
 
-  this.viewProduct = function(event) {
-    event.preventDefault();
+  this.viewProduct = function(event, change_hash) {
+    var change_hash = change_hash || 'yes';
+    if(event)
+      event.preventDefault();
     var clickedQuickView = $(this);
-    var url = $(this).data('href').split('/');
+    var url = homeProduct.getUrl(change_hash, $(this));
     $('#side-panel').remove();
+    url = url.split('/');
     var displayedProduct = homeProduct.getDisplayedProduct(url);
     var displayedColor = homeProduct.getDisplayedColor(displayedProduct, url);
     var productFocus = homeProduct.getProductFocus();
     homeProduct.displayProductDetails(displayedProduct, displayedColor, productFocus);
     $main_container.html(productFocus);
+  }
+
+  this.getUrl = function(change_hash, current_product) {
+    var url = '';
+    if(change_hash == 'yes') {
+      url = current_product.data('href');
+      var url_params = url.split('/');
+      window.location.hash = "#" + url_params[1] + "-" + url_params[2] + "-" + url_params[3] + "-" + url_params[4];
+    }
+    else {
+      url = window.location.hash.replace(new RegExp('-','g'), '/');
+      url = url.replace('#','/');
+    }
+    return url;
   }
 // ***************************************************************************
   
@@ -261,9 +282,8 @@ function HomeProductGrid() {
   this.displayAvailableColor = function(productColor, availColorContainer) {
     var productImages = productColor.images;
     $('<div/>', { class: 'color-all'})
-      .data({'images': homeProduct.getImages(productImages, 'small'), 'focussed-image': productImages[0]['medium'], 'image-angles': homeProduct.getImages(productImages, 'medium'), 'sizes': homeProduct.getSizeDetails(productColor, 'name'), 'size-ids': homeProduct.getSizeDetails(productColor, 'id'), 'size-price': homeProduct.getSizeDetails(productColor, 'price'), 'size-discounted-price': homeProduct.getSizeDetails(productColor, 'discounted_price'), 'size-quantity': homeProduct.getSizeDetails(productColor, 'quantity') }).append($('<img>', { 'src': productImages[0]['small'], class: 'small-image'}))
+      .data({'id': productColor.id,'images': homeProduct.getImages(productImages, 'small'), 'focussed-image': productImages[0]['medium'], 'image-angles': homeProduct.getImages(productImages, 'medium'), 'sizes': homeProduct.getSizeDetails(productColor, 'name'), 'size-ids': homeProduct.getSizeDetails(productColor, 'id'), 'size-price': homeProduct.getSizeDetails(productColor, 'price'), 'size-discounted-price': homeProduct.getSizeDetails(productColor, 'discounted_price'), 'size-quantity': homeProduct.getSizeDetails(productColor, 'quantity') }).append($('<img>', { 'src': productImages[0]['small'], class: 'small-image'}))
       .appendTo(availColorContainer);
-
   }
 
   this.getImages = function(images, size) {

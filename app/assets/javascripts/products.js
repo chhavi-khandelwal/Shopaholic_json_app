@@ -55,6 +55,9 @@ function ProductDashBoard() {
 
   this.changeProductAngles = function() {
     var product_color = $(this);
+    var split_window_hash = window.location.hash.split('-');
+    split_window_hash[3] = product_color.data('id');
+    window.location.hash = split_window_hash.join('-'); 
     var sizes = product_color.data('sizes');
     var size = 'none';
     size = productDashBoard.setSize(product_color, size)

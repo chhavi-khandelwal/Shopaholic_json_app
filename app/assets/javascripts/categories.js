@@ -1,23 +1,49 @@
 $(document).ready(function() {
-    var productGrid = new ProductGrid();
-    productGrid.bindEvents();
+  productGrid = new ProductGrid();
+  productGrid.bindEvents();
 });
 
 function ProductGrid() {
     var productGrid = this;
+    var filters = ["brand", "color"];
+    oldHash = '';
 
     //binds click event to the input checkboxes
     this.bindEvents = function() {
-      $('#main-container').on('click', 'input[type="checkbox"]', productGrid.filterProducts);
+      $('#main-container').on('change', 'input[type="checkbox"]', productGrid.filterProducts);
+    }
+
+    this.getWindowHash = function() {
+      var filterString = '', mergedFilterString = '';
+      var j = 0;
+      for (var i = 0, len = filters.length; i < len; i++) {
+        var filter_tags = productGrid.getFilterTags(filters[i]);
+        if (filter_tags.length > 0) {
+          j++;
+          var filter_params = filters[i] + "|" + filter_tags + "|";
+          filterString = (j > 1) ? ('&' + filter_params) : filter_params;
+          mergedFilterString += filterString;
+        }
+      }
+      return mergedFilterString;
+    }
+
+    this.getFilterTags = function(filter) {
+      var filter_tags = [];
+      $('input[data-filter="' + filter + '"]').each(function() {
+        if ($(this).prop('checked')) {
+          filter_tags.push($(this).val());
+        }
+      });
+      return filter_tags;
     }
 
     //filters the products from selected filter
-    this.filterProducts = function() {
-        console.log("a")
+    this.filterProducts = function(change_hash) {
+      productGrid.setWindowHash(change_hash);
       var $gridProducts = $('.latest-products');
       $gridProducts.hide();
       var productfilter = [];
-      var filters = ["brand", "color"];
       for (var i = 0; i < filters.length; i++) {
         productfilter = productGrid.filterSelection(filters[i]);
         if (productfilter.length > 0) {
@@ -25,6 +51,19 @@ function ProductGrid() {
         }
       }
       $gridProducts.show();
+    }
+
+    this.setWindowHash = function(change_hash) {
+      var change_hash = change_hash || 'yes';
+      var hash = productGrid.getWindowHash();
+      var window_hash = window.location.hash.split('-');
+      if (oldHash.length > 0 && change_hash == 'yes') {
+        window.location.hash = window.location.hash.replace(oldHash, hash);
+      }
+      else {
+        window.location.hash = window_hash[0] + "-" + window_hash[1] + "-" + hash;
+      }
+      oldHash = hash;
     }
 
     //selects the filtered products in an array
