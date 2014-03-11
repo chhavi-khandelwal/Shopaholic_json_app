@@ -14,10 +14,12 @@ class Color < ActiveRecord::Base
 
   scope :published, -> { where published: true }
 
+  #FIXME_AB: Method name need to be something else, right now by looking on the method name it looks like it should be a helper method. May be you can name it default_thumbnail. Or just thumbnail 
   def thumbnail_in_focus(size)
     images.first.file.url(size)
   end
 
+  #FIXME_AB: Similar method exists in product.rb
   def set_published
     if sizes.exists?
       update_attributes(published: true)
@@ -27,6 +29,7 @@ class Color < ActiveRecord::Base
     true
   end
 
+  #FIXME_AB: Lets discuss this method, 
   def quantity_flag
     size_hash = {}
     sizes.each do |size|

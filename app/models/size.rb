@@ -4,6 +4,7 @@ class Size < ActiveRecord::Base
   belongs_to :color, touch: true
 
   has_many :line_items, dependent: :destroy
+  #FIXME_AB: instead of carts lets name it orders
   has_many :carts, through: :line_items
 
   validates :name, :price, :quantity, :discounted_price, :sku, presence: true
