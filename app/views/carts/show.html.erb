@@ -15,6 +15,7 @@
 
     <% @cart.line_items.each do |cart_item| %>
       <div class='items-container' data-size-id="<%= cart_item.size.id %>"  data-quantity="<%= cart_item.quantity%>">
+        <% #FIXME_AB: You now know how to handle such situations in code. Most of the following lines can be addressed in a better way -%>
         <%= image_tag(cart_item.size.color.images.first.file.url(:small)) %>
         <p class='item-text'><%= cart_item.size.color.product.title %></p>
         <p class='item-text'><%= cart_item.size.color.product.brand.name %></p>
@@ -28,6 +29,7 @@
   </div>
 
   <div id='total'>
+    <% #FIXME_AB: shouldn't it go in model? -%>
     <span>YOUR TOTAL: <%= @cart.line_items.sum { |line_item|  line_item.size.discounted_price * line_item.quantity } %></span>
     <%= link_to 'Proceed to Pay', payment_cart_path(@cart), id: "proceed-pay", class: "btn" %>
   </div>
