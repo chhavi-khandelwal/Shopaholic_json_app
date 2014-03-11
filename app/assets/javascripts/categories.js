@@ -12,7 +12,8 @@ function ProductGrid() {
     this.bindEvents = function() {
       $('#main-container').on('change', 'input[type="checkbox"]', productGrid.filterProducts);
     }
-
+    
+    //returns window hash on selecting filters
     this.getWindowHash = function() {
       var filterString = '', mergedFilterString = '';
       var j = 0;
@@ -27,7 +28,8 @@ function ProductGrid() {
       }
       return mergedFilterString;
     }
-
+    
+    //returns filters that are marked to filter products
     this.getFilterTags = function(filter) {
       var filter_tags = [];
       $('input[data-filter="' + filter + '"]').each(function() {
@@ -52,7 +54,9 @@ function ProductGrid() {
       }
       $gridProducts.show();
     }
-
+    
+    //set window hash according to change_hash variable
+    // change_hash = yes if filter is marked or browser backbutton is pressed
     this.setWindowHash = function(change_hash) {
       var change_hash = change_hash || 'yes';
       var hash = productGrid.getWindowHash();

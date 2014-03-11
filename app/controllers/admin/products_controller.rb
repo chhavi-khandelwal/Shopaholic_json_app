@@ -47,7 +47,7 @@ class Admin::ProductsController < Admin::AdminsController
 
   private
   def set_product
-    @product = Product.find_by(id: params[:id])
+    @product = Product.includes(colors: [:images, :sizes]).find_by(id: params[:id])
     redirect_to admin_products_path, alert: 'Product Not found' if(@product.nil?)
   end
 

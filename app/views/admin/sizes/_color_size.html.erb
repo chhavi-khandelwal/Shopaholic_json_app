@@ -21,7 +21,7 @@
   </tr>
   <% #FIXME_AB: As a good practice we should not use Models directly in views -%>
   <% @sizes.each do |size| %>
-  <tr id="size_<%= size.id %>", class="<%= Color.find(size.color_id).name %>">
+  <tr id="size_<%= size.id %>", class="<%= size.color.name %>">
     <%= render partial: 'admin/sizes/size', locals: { size: size } %>
   </tr>
   <% end %>

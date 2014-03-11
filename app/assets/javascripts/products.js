@@ -10,7 +10,8 @@ function CartProduct() {
   this.bindEvents = function() {
     $('#main-container').on('click', '#add-cart', this.addProductToCart);
   }
-
+  
+  //adds product to the cart
   this.addProductToCart = function() {
     if($('.size-all.selected').length == 1) {
       cartProduct.getProductResponse($(this));
@@ -37,22 +38,26 @@ function CartProduct() {
 function ProductDashBoard() {
 
   var productDashBoard = this;
-
+  
+  //bind events on the product show page
   this.bindEvents = function() {
     var $main_container = $('#main-container');
     $main_container.on('click', '.angle', function() { productDashBoard.changeFocussedImage($(this)) });
     $main_container.on('click', '.color-all', this.changeProductAngles);
     $main_container.on('click', '.size-all', function() { productDashBoard.setCurrentSizeAndPrice($(this)) });
   }
-
+  
+  //get focussed image of the product color
   this.getFocussedImage = function(product_angle) {
     return ("<img src=" + product_angle.data('focussed-image') + ">");
   }
-
+  
+  //change focussed image of the product color on clicking the different color
   this.changeFocussedImage = function(product_color) {
     $('.product-in-focus').html(productDashBoard.getFocussedImage(product_color));
   }
-
+  
+  //change product angles once clicked on a different color
   this.changeProductAngles = function() {
     var product_color = $(this);
     var split_window_hash = window.location.hash.split('-');
@@ -70,7 +75,8 @@ function ProductDashBoard() {
       productDashBoard.setAngles(product_color, sizes);
     }
   }
-
+  
+  //set size according to the color selected
   this.setSize = function(product_color, size) {
     var size_quantities = product_color.data('size-quantity');
     for(i = 0; i < size_quantities.length; i++)
@@ -83,7 +89,8 @@ function ProductDashBoard() {
     }
     return size;
   }
-
+  
+  //set product color details acc. to color change
   this.setAngles = function(product_color, sizes) {
     var product_angles = productDashBoard.setImageAngles(product_color);
     var product_sizes = productDashBoard.setSizes(product_color, sizes);
@@ -92,7 +99,8 @@ function ProductDashBoard() {
     productDashBoard.changeFocussedImage(product_color);
     productDashBoard.setCurrentSizeAndPrice($('.size-all').not('.disabled').first());
   }
-
+  
+  //set different angles of the productcolor image
   this.setImageAngles = function(product_color) {
     var small_images = product_color.data('images');
     var medium_images = product_color.data('image-angles');
@@ -102,14 +110,16 @@ function ProductDashBoard() {
     }
     return product_angles;
   }
-
+  
+  //get container for angle of the product to be displayed
   this.getProductAngle = function(small_image, medium_image) {
     var productAngle = $('<div/>').addClass('angle')
       .attr('data-focussed-image', medium_image)
       .html("<img src=" + small_image + " class='small-image'>");
     return productAngle;
   }
-
+  
+  //set sizes to be displayed of a particular color
   this.setSizes = function(product_color, sizes) {
     var size_ids = product_color.data('size-ids');
     var size_quantities = product_color.data('size-quantity');
@@ -122,7 +132,8 @@ function ProductDashBoard() {
     }
     return product_sizes;
   }
-
+  
+  //get container to display size detail
   this.getSizeContainer = function(product_color, size, size_class) {
     var size_ids = product_color.data('size-ids');
     var size_prices = product_color.data('size-price');
@@ -131,17 +142,20 @@ function ProductDashBoard() {
     .attr({ 'data-id': size_ids[i], 'data-price': size_prices[i], 'data-discounted-price': size_discounted_prices[i] })
     .html("<span>" + size + "</span>"));
   }
-
+  
+  //set current size and its price of the product color
   this.setCurrentSizeAndPrice = function($current_size) {
     productDashBoard.getSize($current_size);
     productDashBoard.setPrice($current_size);
   }
-
+  
+  //set price
   this.setPrice = function($current_size) {
     $('#real-price').html('Real ' + $current_size.data('price'));
     $('#discounted-price').html('Discounted ' + $current_size.data('discounted-price'));
   }
-
+  
+  //get size of the product color
   this.getSize = function(selected_size) {
     if(selected_size.hasClass('size-all disabled'))
       alert('Size currently not available...!!')
