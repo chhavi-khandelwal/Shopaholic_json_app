@@ -4,8 +4,9 @@ class HomeController < ApplicationController
   def index
   end
 
-  #FIXME_AB: just name it products
+  #FIXME_AB: just name it products, if you move it to products controller then name it as published
   def get_products
+    # @products = Product.includes(:brand, :category, :colors => [:sizes, :images]).where(colors: {published: true}).published.order(:created_at)
     @products = Product.published.order(:created_at)
   end
 end
