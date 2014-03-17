@@ -44,7 +44,7 @@ function ProductDashBoard() {
     var $main_container = $('#main-container');
     $main_container.on('click', '.angle', function() { productDashBoard.changeFocussedImage($(this)) });
     $main_container.on('click', '.color-all', this.changeProductAngles);
-    $main_container.on('click', '.size-all', function() { productDashBoard.setCurrentSizeAndPrice($(this)) });
+    $main_container.on('click', '.size-all', function() { productDashBoard.setUrlHash($(this)) });
   }
   
   //get focussed image of the product color
@@ -60,7 +60,6 @@ function ProductDashBoard() {
   //change product angles once clicked on a different color
   this.changeProductAngles = function() {
     var product_color = $(this);
-    productDashBoard.setUrlHash(product_color);
     var sizes = product_color.data('sizes');
     var size = 'none';
     size = productDashBoard.setSize(product_color, size);
@@ -69,19 +68,17 @@ function ProductDashBoard() {
       $(this).append($('<img>', { class: 'gray', 'src': '/assets/gray.jpg'}))
     }
     else {
-      $('#selected-size-value').find('strong').html(size);
-      productDashBoard.setAngles(product_color, sizes);
+      productDashBoard.setUrlHash(product_color);
     }
   }
 
   this.setUrlHash = function(selected_tag) {
     var window_hash = window.location.hash.split('#')[1].split('&');
     var params = {};
-    console.log(window_hash)
     for (var i = 0, len = window_hash.length; i < len; i++) {
       var x = window_hash[i].split('=');
-      params[x[0]] = params[x[1]];
-      if (selected_tag.hasClass('color-all') || selected_tag.hasClass('size-all')) {
+      params[x[0]] = x[1];
+      if ((selected_tag.hasClass('color-all') && x[0] == 'colors') || (selected_tag.hasClass('size-all') && x[0] == 'size')) {
         params[x[0]] = selected_tag.data('id');
       }
     }

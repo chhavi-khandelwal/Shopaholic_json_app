@@ -86,7 +86,6 @@ function GridPage() {
     var urlHash = {};
     var filterHashParams = [];
     var window_hash = window.location.hash;
-    console.log(window_hash)
     if (window_hash != '') {
       var window_hash_params = window_hash.split('#')[1].split('&');
       for (var i = 0, len = window_hash_params.length; i < len; i++) {
@@ -414,8 +413,8 @@ function GridPage() {
     var size_class ='size-all'
     if(!sizes[key].quantity_available)
       size_class += ' disabled';
-    if (key == 0 && size_class.indexOf('disabled') == -1) {
-        size_class += ' selected'
+    if (hashData['size'] == sizes[key].id) {
+        size_class += ' selected';
       }
     var sizeContainer = $('<div/>', { class: size_class, 'data-id': sizes[key].id, 'data-price': sizes[key].price, 'data-discounted-price': sizes[key].discounted_price });
     return sizeContainer;
