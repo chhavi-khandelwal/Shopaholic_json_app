@@ -1,8 +1,3 @@
-$(document).ready(function() {
-  var color = new Color();
-  productColors = color.getProductColors();
-});
-
 function Color() {
   this.getProductColors = function() {
     var productColors = [];

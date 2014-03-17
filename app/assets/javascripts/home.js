@@ -9,7 +9,7 @@ function HomeProductGrid() {
   var homeProduct = this;
 
   this.resetPageProducts = function() {
-    setTimeout(function() {
+    setInterval(function() {
       homeProduct.getRecent();
     }, 40000);
   }
@@ -21,16 +21,15 @@ function HomeProductGrid() {
       dataType: 'json',
       async: false, 
     }).done(function(data) {
-      $('#latest-products-container').html('');
       products = data;
+    }).complete(function() {
+      $('#latest-products-container').html('');
+      var color = new Color();
+      productColors = color.getProductColors();
+      var gridPage = new GridPage();
+      gridPage.displayFilteredProducts('');
+      homeProduct.resetPageProducts();
     });
-// .complete(function() {
-    //   var color = new Color();
-    //   productColors = color.getProductColors();
-    //   var gridPage = new GridPage();
-    //   gridPage.displayFilteredProducts('');
-    //   homeProduct.resetPageProducts();
-    // });
   }
 
 }

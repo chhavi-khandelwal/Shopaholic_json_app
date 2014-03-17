@@ -4,7 +4,6 @@ $(document).ready(function() {
   var gridPage = new GridPage();
   gridPage.adjustHeight();
   gridPage.bindCategoryNavLinksEvent();
-  gridPage.displayFilteredProducts('');
   gridPage.bindHashChange('');
 });
 
