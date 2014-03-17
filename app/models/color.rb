@@ -15,7 +15,8 @@ class Color < ActiveRecord::Base
   scope :published, -> { where published: true }
 
   #FIXME_AB: Method name need to be something else, right now by looking on the method name it looks like it should be a helper method. May be you can name it default_thumbnail. Or just thumbnail 
-  def thumbnail_in_focus(size)
+  #Fixed
+  def thumbnail(size)
     images.first.file.url(size)
   end
 

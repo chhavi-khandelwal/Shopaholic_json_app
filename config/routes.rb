@@ -76,7 +76,7 @@ Shopaholic::Application.routes.draw do
   end
 
   resources :home
-    get 'get_products', to: "home#get_products", as: :get_products
+    get 'products', to: "home#products", as: :products
   root :to => 'home#index'
   
 end

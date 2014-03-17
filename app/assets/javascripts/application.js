@@ -23,14 +23,3 @@
 //= require categories
 //= require products
 //= require carts
-
-
-// #FIXME_AB: Don't use require tree, include what you need manually
-
-function CategoryProduct() {
-  this.addPolling = function() {
-    setTimeout(function() {
-      categoryProduct.getProducts();
-    }, 40000);
-  }
-}

@@ -1,5 +1,6 @@
 class Admin::SizesController < Admin::AdminsController
   before_action :set_product, only: [:new, :create]
+  before_action :set_color, only: [:create]
   before_action :set_size, only: [:update, :destroy, :edit]
 
 
@@ -10,8 +11,8 @@ class Admin::SizesController < Admin::AdminsController
 
   def create
     #FIXME_AB: What if color not found with the id
-    color = Color.find_by(id: size_params[:color_id])
-    @size = color.sizes.build(size_params)
+    #Fixed
+    @size = @color.sizes.build(size_params)
     if @size.save
       render json: { size: @size, color: @size.color.name }
       flash[:notice] = "Successfully created size"
@@ -42,6 +43,11 @@ class Admin::SizesController < Admin::AdminsController
   def set_product
     @product = Product.find_by(id: params[:product_id])
     redirect_to admin_products_path, alert: 'Product Not found' if(@product.nil?)
+  end
+
+  def set_color
+    color = Color.find_by(id: size_params[:color_id])
+    redirect_to admin_products_path, alert: 'Color Not found' if(@color.nil?)
   end
 
   def size_params

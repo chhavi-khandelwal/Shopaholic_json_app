@@ -163,9 +163,14 @@ function GridPage() {
   }
 
   this.appendHashToUrl = function(category) {
-    var hash = '';
     var categoryId = category.attr('id');
-    window.location.hash = '#categories=' + categoryId;
+    var hash = '#categories=' + categoryId;
+    if (window.location.pathname.indexOf('carts') != -1) {
+      window.location.href = window.location.origin + hash;
+    }
+    else {
+      window.location.hash = hash;
+    }
   }
 
   this.checkSoldOut = function(color) {

@@ -29,8 +29,8 @@
   </div>
 
   <div id='total'>
-    <% #FIXME_AB: shouldn't it go in model? -%>
-    <span>YOUR TOTAL: <%= @cart.line_items.sum { |line_item|  line_item.size.discounted_price * line_item.quantity } %></span>
+    <% #FIXME_AB: shouldn't it go in model? #Fixed -%>
+    <span>YOUR TOTAL: <%= @cart.total_price %></span>
     <%= link_to 'Proceed to Pay', payment_cart_path(@cart), id: "proceed-pay", class: "btn" %>
   </div>
 </div>

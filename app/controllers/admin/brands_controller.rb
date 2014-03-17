@@ -48,7 +48,6 @@ class Admin::BrandsController < Admin::AdminsController
   end
 
   def cannot_destroy_brand
-    #FIXME_AB: Does it also work with delete?
     redirect_to admin_brands_path, notice: "Brand #{ @brand.name } has products..It cannot be destroyed"
   end
 

@@ -24,7 +24,7 @@
   <div class="box-desc">
     <div class="box-recent">
       <% @products.each do |product| %>
-        <%= link_to(image_tag(product.colors.first.thumbnail_in_focus(:medium), width: '75px'), admin_product_path(product))  %>
+        <%= link_to(image_tag(product.colors.first.thumbnail(:medium), width: '75px'), admin_product_path(product))  %>
           <% end %>
      </div>
     <h4>You have <%= @products.count %> total Products</h4>
