@@ -44,7 +44,7 @@ function ProductDashBoard() {
     var $main_container = $('#main-container');
     $main_container.on('click', '.angle', function() { productDashBoard.changeFocussedImage($(this)) });
     $main_container.on('click', '.color-all', this.changeProductAngles);
-    $main_container.on('click', '.size-all', function() { productDashBoard.setUrlHash($(this)) });
+    $main_container.on('click', '.size-all', function() { productDashBoard.setCurrentSizeAndPrice($(this)) });
   }
   
   //get focussed image of the product color
@@ -160,9 +160,9 @@ function ProductDashBoard() {
   
   //set current size and its price of the product color
   this.setCurrentSizeAndPrice = function($current_size) {
-    productDashBoard.setUrlHash($current_size);
-    productDashBoard.getSize($current_size);
-    productDashBoard.setPrice($current_size);
+    if (!$current_size.hasClass('disabled')) {
+      productDashBoard.setUrlHash($current_size);
+    }
   }
   
   //set price
