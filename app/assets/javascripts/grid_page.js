@@ -39,9 +39,7 @@ function GridPage() {
   }
 
   this.displayProduct = function() {
-    $('#latest-products-container').html('');
-    $('.product-focus').html('');
-    $('#new-today').remove();
+    gridPage.resetContainers();
     this.viewProduct();
   }
 
@@ -53,9 +51,7 @@ function GridPage() {
   }
 
   this.displayCategoryProducts = function() {
-    $('#new-today').remove();
-    $('#latest-products-container').html('');
-    $('.product-focus').html('');
+    gridPage.resetContainers();
     $('#side-panel').remove();
     gridColors = gridPage.getProductColors(hashData['categories']);
     gridPage.displayProducts();
@@ -82,6 +78,12 @@ function GridPage() {
     });
   }
 
+  this.resetContainers = function() {
+    $('#new-today').remove();
+    $('#latest-products-container').html('');
+    $('.product-focus').html('');
+  }
+
   this.extractHashData = function() {
     var urlHash = {};
     var filterHashParams = [];
@@ -94,17 +96,23 @@ function GridPage() {
         var paramValue = hashParams[1];
         if (paramValue.indexOf('[') != -1) {
           var filtersHash = paramValue.split('[')[1].split(']')[0];
-          if (filtersHash.indexOf(',') != -1) {
-            filterHashParams = filtersHash.split(',');
-          }
-          else {
-            filterHashParams.push(filtersHash);
-          }
+          filterHashParams = gridPage.getFilterHashParams(filtersHash);
           urlHash[hashParams[0]] = filterHashParams;
         }
       } 
     }
     return urlHash;
+  }
+
+  this.getFilterHashParams = function(filtersHash) {
+    var filterHashParams = [];
+    if (filtersHash.indexOf(',') != -1) {
+      filterHashParams = filtersHash.split(',');
+    }
+    else {
+      filterHashParams.push(filtersHash);
+    }
+    return filterHashParams;
   }
 
 
@@ -414,8 +422,8 @@ function GridPage() {
     if(!sizes[key].quantity_available)
       size_class += ' disabled';
     if (hashData['size'] == sizes[key].id) {
-        size_class += ' selected';
-      }
+      size_class += ' selected';
+    }
     var sizeContainer = $('<div/>', { class: size_class, 'data-id': sizes[key].id, 'data-price': sizes[key].price, 'data-discounted-price': sizes[key].discounted_price });
     return sizeContainer;
   }
