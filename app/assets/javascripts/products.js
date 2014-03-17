@@ -60,12 +60,10 @@ function ProductDashBoard() {
   //change product angles once clicked on a different color
   this.changeProductAngles = function() {
     var product_color = $(this);
-    var split_window_hash = window.location.hash.split('-');
-    split_window_hash[3] = product_color.data('id');
-    window.location.hash = split_window_hash.join('-'); 
+    productDashBoard.setUrlHash(product_color);
     var sizes = product_color.data('sizes');
     var size = 'none';
-    size = productDashBoard.setSize(product_color, size)
+    size = productDashBoard.setSize(product_color, size);
     if(size == 'none') {
       alert('color has no sizes');
       $(this).append($('<img>', { class: 'gray', 'src': '/assets/gray.jpg'}))
@@ -75,14 +73,30 @@ function ProductDashBoard() {
       productDashBoard.setAngles(product_color, sizes);
     }
   }
+
+  this.setUrlHash = function(selected_tag) {
+    var window_hash = window.location.hash.split('#')[1].split('&');
+    var params = {};
+    console.log(window_hash)
+    for (var i = 0, len = window_hash.length; i < len; i++) {
+      var x = window_hash[i].split('=');
+      params[x[0]] = params[x[1]];
+      if (selected_tag.hasClass('color-all') || selected_tag.hasClass('size-all')) {
+        params[x[0]] = selected_tag.data('id');
+      }
+    }
+    var hash_array = [];
+    for (var key in params) {
+      hash_array.push(key + '=' + params[key]); 
+    }
+    window.location.hash = '#' + hash_array.join('&'); 
+  }
   
   //set size according to the color selected
   this.setSize = function(product_color, size) {
     var size_quantities = product_color.data('size-quantity');
-    for(i = 0; i < size_quantities.length; i++)
-    {
-      if(size_quantities[i] > min_quantity)
-      {
+    for (var i = 0, len = size_quantities.length; i < len; i++) {
+      if (size_quantities[i]) {
         size = size_quantities[i];
         break;
       }
@@ -121,13 +135,17 @@ function ProductDashBoard() {
   
   //set sizes to be displayed of a particular color
   this.setSizes = function(product_color, sizes) {
+    var color_id = product_color.data('id');
     var size_ids = product_color.data('size-ids');
     var size_quantities = product_color.data('size-quantity');
     var product_sizes = [];
     for(var i = 0; i < size_ids.length; i++) {
-      var size_class ='size-all'
-      if(size_quantities[i] <= min_quantity)
-        size_class += ' disabled'
+      var size_class ='size-all';
+      if(!size_quantities[i])
+        size_class += ' disabled';
+      if (size_ids[i] == hashData['size']) {
+        size_class += ' selected'
+      }
       product_sizes.push(productDashBoard.getSizeContainer(product_color, sizes[i], size_class));
     }
     return product_sizes;
@@ -139,12 +157,13 @@ function ProductDashBoard() {
     var size_prices = product_color.data('size-price');
     var size_discounted_prices = product_color.data('size-discounted-price');
     return ($('<div/>').addClass(size_class)
-    .attr({ 'data-id': size_ids[i], 'data-price': size_prices[i], 'data-discounted-price': size_discounted_prices[i] })
+    .attr({ 'data-id': size_ids, 'data-price': size_prices, 'data-discounted-price': size_discounted_prices })
     .html("<span>" + size + "</span>"));
   }
   
   //set current size and its price of the product color
   this.setCurrentSizeAndPrice = function($current_size) {
+    productDashBoard.setUrlHash($current_size);
     productDashBoard.getSize($current_size);
     productDashBoard.setPrice($current_size);
   }

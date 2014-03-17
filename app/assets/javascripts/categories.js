@@ -5,24 +5,21 @@ $(document).ready(function() {
 
 function ProductGrid() {
     var productGrid = this;
-    var filters = ["brand", "color"];
     oldHash = '';
 
     //binds click event to the input checkboxes
     this.bindEvents = function() {
-      $('#main-container').on('change', 'input[type="checkbox"]', productGrid.filterProducts);
+      $('#main-container').on('change', 'input[type="checkbox"]', productGrid.setWindowHash);
     }
     
     //returns window hash on selecting filters
     this.getWindowHash = function() {
       var filterString = '', mergedFilterString = '';
-      var j = 0;
       for (var i = 0, len = filters.length; i < len; i++) {
         var filter_tags = productGrid.getFilterTags(filters[i]);
         if (filter_tags.length > 0) {
-          j++;
-          var filter_params = filters[i] + "|" + filter_tags + "|";
-          filterString = (j > 1) ? ('&' + filter_params) : filter_params;
+          var filter_params = filters[i] + '=[' + filter_tags + ']';
+          filterString = '&' + filter_params;
           mergedFilterString += filterString;
         }
       }
@@ -37,12 +34,24 @@ function ProductGrid() {
           filter_tags.push($(this).val());
         }
       });
-      return filter_tags;
+      return filter_tags.join(',');
+    }
+
+    //set window hash according to the checked filters
+    this.setWindowHash = function() {
+      var hash = productGrid.getWindowHash();
+      var window_hash = window.location.hash.split('&')[0];
+      if (oldHash.length > 0) {
+        window.location.hash = window.location.hash.replace(oldHash, hash);
+      }
+      else {
+        window.location.hash = window_hash + hash;
+      }
+      oldHash = hash;
     }
 
     //filters the products from selected filter
-    this.filterProducts = function(change_hash) {
-      productGrid.setWindowHash(change_hash);
+    this.filterProducts = function() {
       var $gridProducts = $('.latest-products');
       $gridProducts.hide();
       var productfilter = [];
@@ -55,45 +64,31 @@ function ProductGrid() {
       $gridProducts.show();
     }
     
-    //set window hash according to change_hash variable
-    // change_hash = yes if filter is marked or browser backbutton is pressed
-    this.setWindowHash = function(change_hash) {
-      var change_hash = change_hash || 'yes';
-      var hash = productGrid.getWindowHash();
-      var window_hash = window.location.hash.split('-');
-      if (oldHash.length > 0 && change_hash == 'yes') {
-        window.location.hash = window.location.hash.replace(oldHash, hash);
-      }
-      else {
-        window.location.hash = window_hash[0] + "-" + window_hash[1] + "-" + hash;
-      }
-      oldHash = hash;
-    }
 
     //selects the filtered products in an array
     this.filterSelection = function(filter) {
-        var selectedProducts = [];
-        var filters = $('#' + filter + '-filters' + ' input[type="checkbox"]:checked');
-        if (filters.length > 0) {
-            filters.each(function() {
-                var filterSelector = filter + "='" + $(this).val() + "'"
-                selectedProducts.push("div.latest-products[data-" + filterSelector + "]");
-            });
-        }
-        return selectedProducts;
+      var selectedProducts = [];
+      var filters = $('#' + filter + '-filters' + ' input[type="checkbox"]:checked');
+      if (filters.length > 0) {
+        filters.each(function() {
+          var filterSelector = filter + "='" + $(this).val() + "'"
+          selectedProducts.push("div.latest-products[data-" + filterSelector + "]");
+        });
+      }
+      return selectedProducts;
     }
 
     //filters the products on the basis of the selected products string using filter()
     this.getFilteredProducts = function(productfilter, $gridProducts) {
-        var filteredProducts = this.getFilteredProductsString(productfilter);
-        var $gridProducts = $gridProducts.filter(filteredProducts);
-        return $gridProducts;
+      var filteredProducts = this.getFilteredProductsString(productfilter);
+      var $gridProducts = $gridProducts.filter(filteredProducts);
+      return $gridProducts;
     }
 
     //creates and returns string of selectedProducts[]
     this.getFilteredProductsString = function(productfilter) {
-        var products = productfilter.join();
-        return products;
+      var products = productfilter.join();
+      return products;
     }
 
 }

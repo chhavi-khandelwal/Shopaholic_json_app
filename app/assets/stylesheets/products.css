@@ -55,6 +55,7 @@
 }
 
 .product-focus {
+  display: inline-block;
   padding-top: 5%;
   margin-left: 5% !important;
 }

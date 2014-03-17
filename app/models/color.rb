@@ -30,7 +30,7 @@ class Color < ActiveRecord::Base
   end
 
   #FIXME_AB: Lets discuss this method, 
-  def quantity_flag
+  def availability?
     size_hash = {}
     sizes.each do |size|
       size_hash[size.id] = size.quantity
