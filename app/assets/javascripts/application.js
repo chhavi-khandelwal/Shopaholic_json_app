@@ -20,9 +20,9 @@
 //= require home
 //= require color
 //= require grid_page
+//= require cart_product
 //= require categories
 //= require products
 //= require carts
-//= require_tree .
 //= require jquery.tmpl.min.js
 //= require jquery.elevateZoom-3.0.8.min

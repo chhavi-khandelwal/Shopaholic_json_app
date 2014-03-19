@@ -10,16 +10,20 @@
 
 .product-angles {
   display: inline-block;
+  vertical-align: top;
   width: 10%;
+}
+
+.display_color {
+  display: block;
+  color: #3A3A38;
+  font-size: 17px;
+  font-family: serif; 
 }
 
 #bottom-panel {
   text-align: center;
   margin-top: 2%;
-}
-
-#before-add {
-  margin-left: 20px !important;
 }
 
 

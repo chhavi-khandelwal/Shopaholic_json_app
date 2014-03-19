@@ -1,0 +1,10 @@
+//= require jquery
+//= require jquery.turbolinks
+//= require jquery_ujs
+//= require twitter/bootstrap
+//= require jquery.ui.all
+//= require turbolinks
+//= require admin/admins.js
+//= require admin/colors.js
+//= require admin/products.js
+//= require admin/sizes.js

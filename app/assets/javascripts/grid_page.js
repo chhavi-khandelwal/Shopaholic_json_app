@@ -217,65 +217,68 @@ function GridPage() {
       this.getFilters(filterElements);
   }
 
-    //get filters to be displayed
-    this.getFilters = function(filterElements) {
-      var filters = ['color', 'brand'];
-      var filterContainer = $('<div/>', {
-        id: 'filters',
-        class: 'span2'
-      });
-      for (var i = 0, len = filters.length; i < len; i++) {
-        var filterHeading = this.getFilterHead(filters[i], filterContainer);
-        var filterCollection = $('<div/>', {
-            id: (filters[i] + '-filters')
-        }).insertAfter(filterHeading);
-        var filterTag = filterElements[filters[i]];
-        this.displayFilterTags(filters[i], filterTag, filterCollection);
-      }
-      $('<div/>', {
-        id: 'side-panel'
-      }).insertBefore(productFocus).append(filterContainer);
+  //get filters to be displayed
+  this.getFilters = function(filterElements) {
+    var filters = ['color', 'brand'];
+    var filterContainer = $('<div/>', {
+      id: 'filters',
+      class: 'span2'
+    });
+    for (var i = 0, len = filters.length; i < len; i++) {
+      var filterHeading = this.getFilterHead(filters[i], filterContainer);
+      var filterCollection = $('<div/>', {
+          id: (filters[i] + '-filters')
+      }).insertAfter(filterHeading);
+      var filterTag = filterElements[filters[i]];
+      this.displayFilterTags(filters[i], filterTag, filterCollection);
     }
+    $('<div/>', {
+      id: 'side-panel'
+    }).insertBefore(productFocus).append(filterContainer);
+  }
 
-    //display filters
-    this.displayFilterTags = function(filter, filterTag, filterCollection) {
-      for (var j = 0, jLen = filterTag.length; j < jLen; j++) {
-        $('<div/>', {
-          class: 'filterElement'
-        }).append($('<input/>', {
-          id : filterTag[j],
-          'type': 'checkbox',
-          'value': filterTag[j],
-          'data-filter': filter
-        }))
-        .append($('<label/>', {
-            class: 'filterName'
-        }).attr('for', filterTag[j])
-          .html(filterTag[j]))
-          .appendTo(filterCollection);
-      }
+  //display filters
+  this.displayFilterTags = function(filter, filterTag, filterCollection) {
+    for (var j = 0, jLen = filterTag.length; j < jLen; j++) {
+      var filterHash = [{ Id: filterTag[j], Filter: filter }];
+      var filterSelector = "<div class='filterElement'><input type='checkbox' value=${ Id } id=${ Id } data-filter=${ Filter }><label for=${ Id } class='filterName'>${ Id }</label></div>";
+      $.template("filterTemplate", filterSelector);
+      $.tmpl("filterTemplate", filterHash).appendTo(filterCollection);
     }
+  }
 
-    //get filter heading and corresponding containers holding it
-    this.getFilterHead = function(filterName, filterContainer) {
-        var filterHead = $('<div/>', {
-            class: 'filter-heading'
-        }).html(filterName).appendTo(filterContainer);
-        return filterHead;
-    }
+  //get filter heading and corresponding containers holding it
+  this.getFilterHead = function(filterName, filterContainer) {
+      var filterHead = $('<div/>', {
+          class: 'filter-heading'
+      }).html(filterName).appendTo(filterContainer);
+      return filterHead;
+  }
 
   //get product details in containers to be displayed
   this.getProductDetails = function(color) {
-    var latest_product = $('<div/>', {class: 'latest-products', id: ('product_color_' + color.id), 'data-color': color.name, 'data-brand': color.brand.name }).appendTo($('#latest-products-container'));
-    var product_image = $('<img>').attr('src', color.images[0]['medium']);
-    this.displayProductImage(product_image, latest_product);
-    var latest_products_desc = $('<div/>').addClass('latest-products-desc').appendTo(latest_product);
+    var productDetails = [{ Id: color.id, Name: color.name, Brand: color.brand.name, Src: color.images[0]['medium'] }];
+    var latest_product = "<div class='latest-products' id=product_color_${ Id } data-color=${ Name } data-brand=${ Brand }><img src=${ Src }></div>";
+    $.template("detailsTemplate", latest_product);
+    var productContainer = $.tmpl("detailsTemplate", productDetails);
+    productContainer.appendTo($('#latest-products-container'));
+    var latest_products_desc = $('<div/>').addClass('latest-products-desc').appendTo(productContainer);
     this.getContent(color, latest_products_desc);
   }
 
-  //displays product Image
-  this.displayProductImage = function(product_image, latest_product) {
-    $('<div/>').addClass('latest-products-image').html(product_image).appendTo(latest_product);
+  //get content for adding description to the product
+  this.getContent = function(color, latest_products_desc) {
+    var title = color['title'];
+    var description = (color['description'].substring(0,20) + '..');
+    var brand = color.brand.name + ' -Rs.' + this.getMinPrice(color);
+    var content = [
+      { Content: title },
+      { Content: description },
+      { Content: brand }
+    ];
+    var contentContainer = "<div><h5>${ Content }</h5></div>";
+    $.template("contentTemplate", contentContainer);
+    $.tmpl("contentTemplate", content).appendTo(latest_products_desc);
   }
 
   //get min price of the color to be displayed on the product label
@@ -286,21 +289,6 @@ function GridPage() {
         min = color.sizes[size_key].price;
     }
     return min;
-  }
-
-  //get content for adding description to the product
-  this.getContent = function(color, latest_products_desc) {
-    var title = color['title'];
-    var description = (color['description'].substring(0,20) + '..');
-    var brand = color.brand.name + ' -Rs.' + this.getMinPrice(color);
-    var content = [
-    { Content: title },
-    { Content: description },
-    { Content: brand }
-    ];
-    var contentContainer = "<div><h5>${Content}</h5></div>";
-    $.template("contentTemplate", contentContainer);
-    $.tmpl("contentTemplate", content).appendTo(latest_products_desc);
   }
   
   //get product description content container
@@ -327,12 +315,10 @@ function GridPage() {
     window.location.hash = "#products=" + color.product_id + "&colors" + "=" + color.id + '&size=' + size_id;
   }
 
-  
   //get product focus container
   this.getAlertContainer = function() {
     $('.product-focus').append($('<div/>', {class: 'alert fade in alert-success visibility', id: 'before-add'}));
   }
-
 
   //calls all the functions that display product
   this.displayProductDetails = function(displayedColor) {
@@ -466,7 +452,7 @@ function GridPage() {
   
   //get available colors of the product
   this.getAvailableColors = function(displayedColor) {
-    var availColorContainer = $('<div/>', { id: 'color-avail' });
+    var availColorContainer = $('<div/>', { id: 'color-avail' }).append($('<span/>', { class: 'display_color'}).html('Colors Available'));
     var productColors = this.getAllProductColors(displayedColor);
     for (var i = 0, len = productColors.length; i < len; i++) {
       this.displayAvailableColor(productColors[i], availColorContainer);

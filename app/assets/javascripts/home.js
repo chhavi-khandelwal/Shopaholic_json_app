@@ -9,9 +9,9 @@ function HomeProductGrid() {
   var homeProduct = this;
 
   this.resetPageProducts = function() {
-    setInterval(function() {
+    setTimeout(function() {
       homeProduct.getRecent();
-    }, 10000);
+    }, 30000);
   }
   
   //get recent products from the database
