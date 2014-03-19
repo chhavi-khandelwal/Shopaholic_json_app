@@ -2,9 +2,7 @@ $(document).ready(function() {
   filters = ["brand", "color"];
   hashData = {};
   var gridPage = new GridPage();
-  gridPage.adjustHeight();
-  gridPage.bindCategoryNavLinksEvent();
-  gridPage.bindHashChange('');
+  gridPage.bindEvents();
 });
 
 function GridPage() {
@@ -12,6 +10,15 @@ function GridPage() {
   var $main_container = $('#main-container');
   var gridColors = [];
   var productFocus = $('.product-focus');
+
+  this.bindEvents = function() {
+    this.adjustHeight();
+    this.bindCategoryNavLinksEvent();
+    this.bindHashChange();
+    if (window.location.hash != '') {
+      this.displayFilteredProducts();
+    }
+  }
 
   this.adjustHeight = function() {
     $('.row-fluid').css('min-height', $(window).height());
@@ -21,7 +28,7 @@ function GridPage() {
     $('.link-tile.category-tile').click(this.bindUrlHashChange);
   }
 
-  this.displayFilteredProducts = function(categoryId) {
+  this.displayFilteredProducts = function() {
     hashData = {};
     hashData = gridPage.extractHashData();
     for (key in hashData) {
@@ -61,8 +68,8 @@ function GridPage() {
         gridPage.checkFilters(filters[i]);
       }
     }
-    var p = new ProductGrid();
-    p.filterProducts();
+    var productGrid = new ProductGrid();
+    productGrid.filterProducts();
   }
 
   //mark checkboxes of filters to be true or false accordingly 
@@ -150,14 +157,13 @@ function GridPage() {
     if (event) {
       event.preventDefault();
     }
-    var category = $(this);
-    gridPage.appendHashToUrl(category);
-    gridPage.bindHashChange(category.attr('id'));
+    gridPage.appendHashToUrl($(this));
+    gridPage.bindHashChange();
   }
 
-  this.bindHashChange = function(category) {
+  this.bindHashChange = function() {
     window.onhashchange = function() {
-      gridPage.displayFilteredProducts(category);
+      gridPage.displayFilteredProducts();
     }
   }
 
@@ -176,7 +182,7 @@ function GridPage() {
     var latest_product = $('#product_color_' + color.id);
     var selected_size_id = this.getSelectedAvailableSize(color);
     if (color.availability) {
-      latest_product.find('.quick-view.btn').on('click', function() { gridPage.setProductShowUrl($(this), selected_size_id) });
+      latest_product.on('click', function() { gridPage.setProductShowUrl(color, selected_size_id) });
     } 
     else {
       latest_product.find('.latest-products-image').append($('<img>', {
@@ -236,15 +242,17 @@ function GridPage() {
       for (var j = 0, jLen = filterTag.length; j < jLen; j++) {
         $('<div/>', {
           class: 'filterElement'
-        }).append($('<input>', {
+        }).append($('<input/>', {
+          id : filterTag[j],
           'type': 'checkbox',
           'value': filterTag[j],
           'data-filter': filter
         }))
-        .append($('<span/>', {
+        .append($('<label/>', {
             class: 'filterName'
-        }).html(filterTag[j]))
-        .appendTo(filterCollection);
+        }).attr('for', filterTag[j])
+          .html(filterTag[j]))
+          .appendTo(filterCollection);
       }
     }
 
@@ -258,10 +266,9 @@ function GridPage() {
 
   //get product details in containers to be displayed
   this.getProductDetails = function(color) {
-    var latest_product = $('<div/>', {class: 'latest-products', id: ('product_color_' + color.id), 'data-color': color.name, 'data-brand': color.brand.name,}).appendTo($('#latest-products-container'));
+    var latest_product = $('<div/>', {class: 'latest-products', id: ('product_color_' + color.id), 'data-color': color.name, 'data-brand': color.brand.name }).appendTo($('#latest-products-container'));
     var product_image = $('<img>').attr('src', color.images[0]['medium']);
     this.displayProductImage(product_image, latest_product);
-    this.displayQuickViewBtn(color, product_image);
     var latest_products_desc = $('<div/>').addClass('latest-products-desc').appendTo(latest_product);
     this.getContent(color, latest_products_desc);
   }
@@ -269,13 +276,6 @@ function GridPage() {
   //displays product Image
   this.displayProductImage = function(product_image, latest_product) {
     $('<div/>').addClass('latest-products-image').html(product_image).appendTo(latest_product);
-  }
-
-  
-  //display quick view button
-  this.displayQuickViewBtn = function(color, product_image) {
-    var quick_view = this.createQuickViewBtn(color);
-    quick_view.insertAfter(product_image);
   }
 
   //get min price of the color to be displayed on the product label
@@ -288,19 +288,19 @@ function GridPage() {
     return min;
   }
 
-  //create quick view button
-  this.createQuickViewBtn = function(color) {
-    return ($('<a/>').attr({'data-href': '/products/' + color.product_id + '/colors/' + color.id, class: 'quick-view visibility btn'}).html('Quick View'));
-  }
-  
   //get content for adding description to the product
   this.getContent = function(color, latest_products_desc) {
     var title = color['title'];
-    this.getContentContainer(title, latest_products_desc);
     var description = (color['description'].substring(0,20) + '..');
-    this.getContentContainer(description, latest_products_desc);
-    var brand = color.brand.name + ' <b>-Rs.' + this.getMinPrice(color) + '</b>';
-    this.getContentContainer(brand, latest_products_desc);
+    var brand = color.brand.name + ' -Rs.' + this.getMinPrice(color);
+    var content = [
+    { Content: title },
+    { Content: description },
+    { Content: brand }
+    ];
+    var contentContainer = "<div><h5>${Content}</h5></div>";
+    $.template("contentTemplate", contentContainer);
+    $.tmpl("contentTemplate", content).appendTo(latest_products_desc);
   }
   
   //get product description content container
@@ -323,17 +323,14 @@ function GridPage() {
   }
 
   //get new url for product show
-  this.setProductShowUrl = function(viewButton, size_id) {
-    var url = '';
-    url = viewButton.data('href');
-    var url_params = url.split('/');
-    window.location.hash = "#" + url_params[1] + "=" + url_params[2] + "&" + url_params[3] + "=" + url_params[4] + '&size=' + size_id;
+  this.setProductShowUrl = function(color, size_id) {
+    window.location.hash = "#products=" + color.product_id + "&colors" + "=" + color.id + '&size=' + size_id;
   }
 
   
   //get product focus container
   this.getAlertContainer = function() {
-    $('.product-focus').append($('<div/>', {class: 'alert fade in alert-danger visibility', id: 'before-add'}));
+    $('.product-focus').append($('<div/>', {class: 'alert fade in alert-success visibility', id: 'before-add'}));
   }
 
 
@@ -362,20 +359,22 @@ function GridPage() {
     var images = displayedColor.images;
     for (var image_key in images) {
       var image = this.getCurrentProductImage(images[image_key]['medium']);
-      $('<div/>', {class: 'angle', 'data-focussed-image': images[image_key]['medium'] }).append(image.addClass('small-image')).appendTo(productAngles);
+      $('<div/>', {class: 'angle', 'data-focussed-image': images[image_key]['medium'], 'data-large-image': images[image_key]['large'] }).append(image.addClass('small-image')).appendTo(productAngles);
     }
+    $('.angle:first').addClass('selected');
   }
   
   //display product in focus in the focus container
   this.displayProductInFocus = function(images) {
-    var image = this.getCurrentProductImage(images[0]['medium']);
+    var image = this.getCurrentProductImage(images[0]['medium'], images[0]['large']);
     var productInFocus = $('<div/>', { class: 'product-in-focus' }).append(image);
+    image.elevateZoom({ zoomWindowPosition: 1, zoomWindowHeight: 200, zoomWindowWidth: 200 });
     return productInFocus;
   }
   
   //get image of the current product
-  this.getCurrentProductImage = function(image) {
-    var image = $('<img>', {'src': image});
+  this.getCurrentProductImage = function(medium_image, large_image) {
+    var image = $('<img>', {'src': medium_image, id: 'zoomed_image', 'data-zoom-image':large_image});
     return image;
   }
   
@@ -383,14 +382,14 @@ function GridPage() {
   this.getOfferedSizes = function(displayedColor) {
     var sizeNameTag = $('<div/>', { id: 'size-name', class: 'block-tile'});
     var offeredSizesContainer = $('<div/>', { id: 'offer-sizes' }).append(sizeNameTag);
-    sizeNameTag.append($('<p/>', { class: 'inline-tile' }).html('SELECT SIZE - '))
+    sizeNameTag.append($('<p/>', { class: 'inline-tile' }).html('SELECT SIZE - '));
     this.getCurrentProductSize(displayedColor, sizeNameTag);
     this.displaySizeContainer(displayedColor, offeredSizesContainer);
     var sizePrice = this.getPrice(displayedColor);
     sizePrice.appendTo(offeredSizesContainer);
     return offeredSizesContainer;
   }
-  
+
   //get first available size of the product color
   this.getFirstSize = function(displayedColor) {
     var sizes = displayedColor.sizes; 
@@ -488,9 +487,15 @@ function GridPage() {
   //display available colors of the product
   this.displayAvailableColor = function(productColor, availColorContainer) {
     var productImages = productColor.images;
-    $('<div/>', { class: 'color-all'})
-      .data({'id': productColor.id, 'images': this.getImages(productImages, 'small'), 'focussed-image': productImages[0]['medium'], 'image-angles': this.getImages(productImages, 'medium'), 'sizes': this.getSizeDetails(productColor, 'name'), 'size-ids': this.getSizeDetails(productColor, 'id'), 'size-price': this.getSizeDetails(productColor, 'price'), 'size-discounted-price': this.getSizeDetails(productColor, 'discounted_price'), 'size-quantity': this.getSizeDetails(productColor, 'quantity_available') }).append($('<img>', { 'src': productImages[0]['small'], class: 'small-image'}))
+    var availableColorContainer = this.getAvailableColorContainer(productColor, productImages);
+    availableColorContainer.append($('<img>', { 'src': productImages[0]['small'], class: 'small-image'}))
       .appendTo(availColorContainer);
+  }
+
+  this.getAvailableColorContainer = function(productColor, productImages) {
+    var availableColorContainer = $('<div/>', { class: 'color-all'})
+      .data({'id': productColor.id, 'images': this.getImages(productImages, 'small'), 'focussed-image': productImages[0]['medium'], 'image-angles': this.getImages(productImages, 'medium'), 'sizes': this.getSizeDetails(productColor, 'name'), 'size-ids': this.getSizeDetails(productColor, 'id'), 'size-price': this.getSizeDetails(productColor, 'price'), 'size-discounted-price': this.getSizeDetails(productColor, 'discounted_price'), 'size-quantity': this.getSizeDetails(productColor, 'quantity_available') });
+    return availableColorContainer;
   }
   
   //get images of the corresponding color

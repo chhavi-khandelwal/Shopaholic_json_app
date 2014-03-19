@@ -15,6 +15,7 @@ function CartProduct() {
   this.addProductToCart = function() {
     if($('.size-all.selected').length == 1) {
       cartProduct.getProductResponse($(this));
+      $('#before-add').toggleClass('visibility').html('Product added to your cart');
     }
     else {
       $('#before-add').toggleClass('visibility').html('Select a size');
@@ -42,19 +43,24 @@ function ProductDashBoard() {
   //bind events on the product show page
   this.bindEvents = function() {
     var $main_container = $('#main-container');
-    $main_container.on('click', '.angle', function() { productDashBoard.changeFocussedImage($(this)) });
+    $main_container.on('click', '.angle', this.changeFocussedImage);
     $main_container.on('click', '.color-all', this.changeProductAngles);
     $main_container.on('click', '.size-all', function() { productDashBoard.setCurrentSizeAndPrice($(this)) });
   }
   
   //get focussed image of the product color
   this.getFocussedImage = function(product_angle) {
-    return ("<img src=" + product_angle.data('focussed-image') + ">");
+    var image = $("<img>", { 'src': product_angle.data('focussed-image'), id: 'zoomed_image', 'data-zoom-image': product_angle.data('large-image') });
+    return image;
+    
   }
   
   //change focussed image of the product color on clicking the different color
-  this.changeFocussedImage = function(product_color) {
-    $('.product-in-focus').html(productDashBoard.getFocussedImage(product_color));
+  this.changeFocussedImage = function() {
+    $(this).addClass('selected').siblings().removeClass('selected');
+    var image = productDashBoard.getFocussedImage($(this));
+    $('.product-in-focus').html(image);
+    image.elevateZoom({ zoomWindowPosition: 1, zoomWindowHeight: 200, zoomWindowWidth: 200 });
   }
   
   //change product angles once clicked on a different color
@@ -69,6 +75,7 @@ function ProductDashBoard() {
     }
     else {
       productDashBoard.setUrlHash(product_color);
+      product_color.addClass('selected').siblings().removeClass('selected');
     }
   }
 

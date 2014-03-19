@@ -15,6 +15,7 @@ json.(@products) do |json, product|
     json.images color.images do |json, image|
       json.small image.thumbnail(:small)
       json.medium image.thumbnail(:medium)
+      json.large image.thumbnail(:large)
     end
     json.availability color.availability?
   end

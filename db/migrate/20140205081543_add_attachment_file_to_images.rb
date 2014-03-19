@@ -4,6 +4,6 @@ class AddAttachmentFileToImages < ActiveRecord::Migration
   end
 
   def self.down
-    remove_attachment :images, :avatar
+    remove_attachment :images, :file
   end
 end

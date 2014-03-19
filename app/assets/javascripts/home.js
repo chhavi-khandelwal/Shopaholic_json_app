@@ -11,7 +11,7 @@ function HomeProductGrid() {
   this.resetPageProducts = function() {
     setInterval(function() {
       homeProduct.getRecent();
-    }, 40000);
+    }, 10000);
   }
   
   //get recent products from the database
@@ -27,8 +27,10 @@ function HomeProductGrid() {
       var color = new Color();
       productColors = color.getProductColors();
       var gridPage = new GridPage();
-      gridPage.displayFilteredProducts('');
-      homeProduct.resetPageProducts();
+      gridPage.displayFilteredProducts();
+      if (window.location.hash.indexOf('size') == -1) {
+        homeProduct.resetPageProducts();
+      }
     });
   }
 

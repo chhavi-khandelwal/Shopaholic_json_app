@@ -7,7 +7,7 @@ class CartsController < ApplicationController
     #FIXME_AB: You should not modify original qty of the size. Instead whenever you should calculate the remaining qty by original qty - ordered qty.
     #Fixed
     quantity = params[:quantities]
-    Size.where(id: params[:ids]).each_with_index do |size,index|
+    Size.where(id: params[:ids]).each_with_index do |size, index|
       original_quantity = size.quantity
       ordered_quantity = quantity[index].to_i
       if(original_quantity - ordered_quantity > 0) 

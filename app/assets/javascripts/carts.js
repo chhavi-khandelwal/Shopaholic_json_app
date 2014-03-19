@@ -26,7 +26,6 @@ function CartHelper() {
     $.ajax({
       url: $(this).attr('href'),
       data: cartHelper.extract_size_and_quantity(),
-      // dataType: 'JSON'
     }).complete(function(data) {
     });
   }
